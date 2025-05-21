@@ -1,16 +1,19 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { COLORS, FONT } from '@/constants/theme';
-import { format, isToday } from 'date-fns';
+import { COLORS } from '@/constants/theme';
+import { format, isToday, isFuture } from 'date-fns';
+import { useTrack } from '@/context/TrackContext';
 
 type ScoreCellProps = {
   date: Date;
   score: number | null;
+  onRate?: () => void;
 };
 
-export default function ScoreCell({ date, score }: ScoreCellProps) {
+export default function ScoreCell({ date, score, onRate }: ScoreCellProps) {
   const day = date.getDate();
   const isCurrentDay = isToday(date);
+  const isFutureDate = isFuture(date);
   
   const getScoreColor = (value: number) => {
     if (value <= 25) return COLORS.scoreLow;
@@ -20,7 +23,11 @@ export default function ScoreCell({ date, score }: ScoreCellProps) {
   };
   
   return (
-    <View style={styles.cell}>
+    <TouchableOpacity 
+      style={styles.cell}
+      onPress={onRate}
+      disabled={isFutureDate || score !== null}
+    >
       <View 
         style={[
           styles.cellContent,
@@ -47,48 +54,6 @@ export default function ScoreCell({ date, score }: ScoreCellProps) {
           </View>
         )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
-
-const styles = StyleSheet.create({
-  cell: {
-    width: '14.28%', // 100% / 7 days
-    aspectRatio: 1,
-    padding: 2,
-  },
-  cellContent: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.cardBackground,
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: COLORS.borderColor,
-  },
-  today: {
-    borderColor: COLORS.primary,
-    borderWidth: 2,
-  },
-  dayText: {
-    fontFamily: 'Inter-Medium',
-    fontSize: 14,
-    color: COLORS.textPrimary,
-  },
-  todayText: {
-    color: COLORS.primary,
-  },
-  scoreIndicator: {
-    width: '80%',
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginTop: 4,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  scoreText: {
-    fontFamily: 'Inter-Medium',
-    fontSize: 11,
-    color: COLORS.textPrimary,
-  },
-});

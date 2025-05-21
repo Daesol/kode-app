@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS } from '@/constants/theme';
 import { format, startOfMonth } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import ScoreCell from '@/components/ScoreCell';
+import ScoreInput from '@/components/ScoreInput';
+import { useTrack } from '@/context/TrackContext';
 
 type CalendarLayoutProps = {
   currentMonth: Date;
@@ -18,6 +20,27 @@ export default function CalendarLayout({
   onPrevMonth,
   onNextMonth
 }: CalendarLayoutProps) {
+  const [showRating, setShowRating] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const { addScore } = useTrack();
+
+  const handleCellPress = (date: Date) => {
+    const dateString = format(date, 'yyyy-MM-dd');
+    if (!scores[dateString]) {
+      setSelectedDate(date);
+      setShowRating(true);
+    }
+  };
+
+  const handleRatingSubmit = (score: number) => {
+    if (selectedDate) {
+      const dateString = format(selectedDate, 'yyyy-MM-dd');
+      addScore(score);
+    }
+    setShowRating(false);
+    setSelectedDate(null);
+  };
+
   const renderMonthDays = () => {
     const monthStart = startOfMonth(currentMonth);
     const monthStartDay = monthStart.getDay();
@@ -47,7 +70,8 @@ export default function CalendarLayout({
         <ScoreCell 
           key={dateString}
           date={date}
-          score={score} 
+          score={score}
+          onRate={() => handleCellPress(date)}
         />
       );
     }
@@ -56,82 +80,47 @@ export default function CalendarLayout({
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.monthSelector}>
-        <TouchableOpacity onPress={onPrevMonth} style={styles.monthButton}>
-          <ChevronLeft size={24} color={COLORS.textPrimary} />
-        </TouchableOpacity>
+    <>
+      <View style={styles.container}>
+        <View style={styles.monthSelector}>
+          <TouchableOpacity onPress={onPrevMonth} style={styles.monthButton}>
+            <ChevronLeft size={24} color={COLORS.textPrimary} />
+          </TouchableOpacity>
+          
+          <Text style={styles.monthTitle}>
+            {format(currentMonth, 'MMMM yyyy')}
+          </Text>
+          
+          <TouchableOpacity 
+            onPress={onNextMonth} 
+            style={styles.monthButton}
+          >
+            <ChevronRight size={24} color={COLORS.textPrimary} />
+          </TouchableOpacity>
+        </View>
         
-        <Text style={styles.monthTitle}>
-          {format(currentMonth, 'MMMM yyyy')}
-        </Text>
+        <View style={styles.weekdaysContainer}>
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
+            <Text key={day} style={styles.weekdayText}>{day}</Text>
+          ))}
+        </View>
         
-        <TouchableOpacity 
-          onPress={onNextMonth} 
-          style={styles.monthButton}
-        >
-          <ChevronRight size={24} color={COLORS.textPrimary} />
-        </TouchableOpacity>
-      </View>
-      
-      <View style={styles.weekdaysContainer}>
-        {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(day => (
-          <Text key={day} style={styles.weekdayText}>{day}</Text>
-        ))}
-      </View>
-      
-      <View style={styles.gridContainer}>
-        <View style={styles.grid}>
-          {renderMonthDays()}
+        <View style={styles.gridContainer}>
+          <View style={styles.grid}>
+            {renderMonthDays()}
+          </View>
         </View>
       </View>
-    </View>
+
+      {showRating && (
+        <ScoreInput
+          onSubmit={handleRatingSubmit}
+          onCancel={() => {
+            setShowRating(false);
+            setSelectedDate(null);
+          }}
+        />
+      )}
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  monthSelector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    marginTop: 10,
-    marginBottom: 15,
-  },
-  monthButton: {
-    padding: 8,
-  },
-  monthTitle: {
-    fontFamily: 'Inter-Bold',
-    fontSize: 18,
-    color: COLORS.textPrimary,
-  },
-  weekdaysContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 12,
-    marginBottom: 10,
-  },
-  weekdayText: {
-    flex: 1,
-    textAlign: 'center',
-    fontFamily: 'Inter-Medium',
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  gridContainer: {
-    flex: 1,
-    paddingHorizontal: 12,
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  emptyDay: {
-    width: '14.28%',
-    aspectRatio: 1,
-    padding: 2,
-  },
-});
