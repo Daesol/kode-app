@@ -10,8 +10,13 @@ import { useState } from 'react';
 export default function TabLayout() {
   const insets = useSafeAreaInsets();
   const [showRating, setShowRating] = useState(false);
-  const { getTodayScore } = useTrack();
+  const { getTodayScore, addScore } = useTrack();
   const todayScore = getTodayScore();
+
+  const handleScoreSubmit = (score: number) => {
+    addScore(score);
+    setShowRating(false);
+  };
 
   return (
     <>
@@ -63,7 +68,6 @@ export default function TabLayout() {
               >
                 <View style={[
                   styles.rateButtonInner,
-                  todayScore !== null && styles.rateButtonUpdating
                 ]}>
                   <Calendar
                     size={24}
@@ -97,9 +101,7 @@ export default function TabLayout() {
 
       {showRating && (
         <ScoreInput
-          onSubmit={(score) => {
-            setShowRating(false);
-          }}
+          onSubmit={handleScoreSubmit}
           onCancel={() => setShowRating(false)}
         />
       )}
@@ -136,9 +138,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
-  },
-  rateButtonUpdating: {
-    backgroundColor: COLORS.secondary,
   },
   rateIcon: {
     shadowColor: '#000',
