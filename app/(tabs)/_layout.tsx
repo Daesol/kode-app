@@ -60,11 +60,10 @@ export default function TabLayout() {
                   { bottom: insets.bottom > 0 ? 20 : 10 }
                 ]}
                 onPress={() => setShowRating(true)}
-                disabled={todayScore !== null}
               >
                 <View style={[
                   styles.rateButtonInner,
-                  todayScore !== null && styles.rateButtonDisabled
+                  todayScore !== null && styles.rateButtonUpdating
                 ]}>
                   <Calendar
                     size={24}
@@ -138,9 +137,8 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
-  rateButtonDisabled: {
-    backgroundColor: COLORS.textDisabled,
-    shadowOpacity: 0,
+  rateButtonUpdating: {
+    backgroundColor: COLORS.secondary,
   },
   rateIcon: {
     shadowColor: '#000',
