@@ -57,3 +57,44 @@ export default function ScoreCell({ date, score, onRate }: ScoreCellProps) {
     </TouchableOpacity>
   );
 }
+
+// Add the StyleSheet definition here
+const styles = StyleSheet.create({
+  cell: {
+    padding: 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  cellContent: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  today: {
+    backgroundColor: COLORS.primary,
+  },
+  dayText: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+  todayText: {
+    color: 'white',
+  },
+  scoreIndicator: {
+    position: 'absolute',
+    bottom: -4,
+    right: -4,
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  scoreText: {
+    fontSize: 10,
+    color: 'white',
+    fontWeight: 'bold',
+  },
+});
