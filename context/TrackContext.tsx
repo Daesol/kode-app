@@ -14,7 +14,7 @@ type ReminderTimeState = {
 type TrackContextType = {
   scores: ScoresState;
   reminderTime: ReminderTimeState;
-  addScore: (score: number) => void;
+  addScore: (score: number, date?: Date) => void;
   getTodayScore: () => number | null;
   getWeekAverage: () => number;
   getAllTimeAverage: () => number;
@@ -46,8 +46,6 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           [threeDaysAgo]: 65,
           [twoDaysAgo]: 78,
           [yesterday]: 82,
-          // Uncomment to simulate today already being tracked:
-          // [today]: 90,
         });
       } catch (error) {
         console.error('Failed to load saved data', error);
@@ -57,15 +55,13 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     loadSavedData();
   }, []);
   
-  // Add a new score for today
-  const addScore = (score: number) => {
-    const today = format(new Date(), 'yyyy-MM-dd');
+  // Add a new score for a specific date
+  const addScore = (score: number, date: Date = new Date()) => {
+    const dateString = format(date, 'yyyy-MM-dd');
     setScores(prev => ({
       ...prev,
-      [today]: score,
+      [dateString]: score,
     }));
-    
-    // In a real app, you would save to AsyncStorage here
   };
   
   // Get today's score if it exists
