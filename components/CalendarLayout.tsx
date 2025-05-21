@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS } from '@/constants/theme';
 import { format, startOfMonth } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import ScoreCell from '@/components/ScoreCell';
+import ScoreInput from '@/components/ScoreInput';
+import { useTrack } from '@/context/TrackContext';
 
 type CalendarLayoutProps = {
   currentMonth: Date;
@@ -18,6 +20,23 @@ export default function CalendarLayout({
   onPrevMonth,
   onNextMonth
 }: CalendarLayoutProps) {
+  const [showRating, setShowRating] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const { addScore } = useTrack();
+
+  const handleDayPress = (date: Date) => {
+    setSelectedDate(date);
+    setShowRating(true);
+  };
+
+  const handleScoreSubmit = (score: number) => {
+    if (selectedDate) {
+      addScore(score);
+      setShowRating(false);
+      setSelectedDate(null);
+    }
+  };
+
   const renderMonthDays = () => {
     const monthStart = startOfMonth(currentMonth);
     const monthStartDay = monthStart.getDay();
@@ -47,7 +66,8 @@ export default function CalendarLayout({
         <ScoreCell 
           key={dateString}
           date={date}
-          score={score} 
+          score={score}
+          onPress={handleDayPress}
         />
       );
     }
@@ -85,6 +105,16 @@ export default function CalendarLayout({
           {renderMonthDays()}
         </View>
       </View>
+
+      {showRating && (
+        <ScoreInput
+          onSubmit={handleScoreSubmit}
+          onCancel={() => {
+            setShowRating(false);
+            setSelectedDate(null);
+          }}
+        />
+      )}
     </View>
   );
 }

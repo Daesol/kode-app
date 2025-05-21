@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, ScrollView, useWindowDimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, ScrollView, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { COLORS } from '@/constants/theme';
-import { format, subDays, isAfter, isBefore, parseISO } from 'date-fns';
+import { format, subDays, isAfter, isBefore, parseISO, isToday } from 'date-fns';
+import ScoreInput from './ScoreInput';
+import { useTrack } from '@/context/TrackContext';
 
 type BlockLayoutProps = {
   scores: Record<string, number>;
@@ -16,6 +18,9 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
   const [startDate, setStartDate] = useState<Date>(new Date());
   const today = useRef(new Date()).current;
+  const [showRating, setShowRating] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const { addScore } = useTrack();
 
   // Calculate item size based on screen dimensions
   const getItemSize = () => {
@@ -40,22 +45,11 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
       
       if (dateStrings.length === 0) {
         // No scores, use today as end date
-        setStartDate(today);
+        setStartDate(date);
         return;
       }
 
-      // Find the first rated date within our window
-      while (isBefore(date, today)) {
-        const dateString = format(date, 'yyyy-MM-dd');
-        if (scores[dateString] !== undefined) {
-          setStartDate(date);
-          return;
-        }
-        date = subDays(date, -1); // Move forward one day
-      }
-
-      // If no rated blocks found, use today
-      setStartDate(today);
+      setStartDate(date);
     };
 
     findStartDate();
@@ -69,6 +63,21 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
     return COLORS.scoreHigh;
   };
 
+  const handleDayPress = (date: Date) => {
+    if (!isAfter(date, today)) {
+      setSelectedDate(date);
+      setShowRating(true);
+    }
+  };
+
+  const handleScoreSubmit = (score: number) => {
+    if (selectedDate) {
+      addScore(score);
+      setShowRating(false);
+      setSelectedDate(null);
+    }
+  };
+
   const renderBlocks = () => {
     const blocks = [];
     let currentDate = startDate;
@@ -79,26 +88,34 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
       const score = scores[dateString] || null;
       const formattedDate = format(currentDate, 'M/d');
       const isRatable = !isAfter(currentDate, today);
+      const isCurrentDay = isToday(currentDate);
       
       blocks.push(
-        <View 
+        <TouchableOpacity 
           key={dateString} 
-          style={[
-            styles.block,
-            { 
-              width: itemSize,
-              height: itemSize,
-              backgroundColor: getScoreColor(score),
-              opacity: isRatable ? 1 : 0.5 
-            }
-          ]}
+          onPress={() => handleDayPress(currentDate)}
+          disabled={!isRatable}
         >
-          {score !== null ? (
-            <Text style={[styles.scoreText, { fontSize: itemSize * 0.3 }]}>{score}</Text>
-          ) : (
-            <Text style={[styles.dateText, { fontSize: itemSize * 0.25 }]}>{formattedDate}</Text>
-          )}
-        </View>
+          <View 
+            style={[
+              styles.block,
+              { 
+                width: itemSize,
+                height: itemSize,
+                backgroundColor: getScoreColor(score),
+                opacity: isRatable ? 1 : 0.5,
+                borderColor: isCurrentDay ? COLORS.primary : COLORS.borderColor,
+                borderWidth: isCurrentDay ? 2 : 1,
+              }
+            ]}
+          >
+            {score !== null ? (
+              <Text style={[styles.scoreText, { fontSize: itemSize * 0.3 }]}>{score}</Text>
+            ) : (
+              <Text style={[styles.dateText, { fontSize: itemSize * 0.25 }]}>{formattedDate}</Text>
+            )}
+          </View>
+        </TouchableOpacity>
       );
 
       currentDate = subDays(currentDate, -1);
@@ -113,16 +130,28 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
   };
 
   return (
-    <ScrollView 
-      style={styles.container}
-      showsVerticalScrollIndicator={false}
-      onScroll={handleScroll}
-      scrollEventThrottle={16}
-    >
-      <View style={[styles.grid, { gap: GRID_SPACING }]}>
-        {renderBlocks()}
-      </View>
-    </ScrollView>
+    <>
+      <ScrollView 
+        style={styles.container}
+        showsVerticalScrollIndicator={false}
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+      >
+        <View style={[styles.grid, { gap: GRID_SPACING }]}>
+          {renderBlocks()}
+        </View>
+      </ScrollView>
+
+      {showRating && (
+        <ScoreInput
+          onSubmit={handleScoreSubmit}
+          onCancel={() => {
+            setShowRating(false);
+            setSelectedDate(null);
+          }}
+        />
+      )}
+    </>
   );
 }
 
@@ -139,8 +168,6 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.borderColor,
   },
   dateText: {
     fontFamily: 'Inter-Medium',

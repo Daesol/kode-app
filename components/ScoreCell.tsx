@@ -1,16 +1,18 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { COLORS, FONT } from '@/constants/theme';
-import { format, isToday } from 'date-fns';
+import { COLORS } from '@/constants/theme';
+import { format, isToday, isAfter } from 'date-fns';
 
 type ScoreCellProps = {
   date: Date;
   score: number | null;
+  onPress?: (date: Date) => void;
 };
 
-export default function ScoreCell({ date, score }: ScoreCellProps) {
+export default function ScoreCell({ date, score, onPress }: ScoreCellProps) {
   const day = date.getDate();
   const isCurrentDay = isToday(date);
+  const isFutureDate = isAfter(date, new Date());
   
   const getScoreColor = (value: number) => {
     if (value <= 25) return COLORS.scoreLow;
@@ -20,11 +22,16 @@ export default function ScoreCell({ date, score }: ScoreCellProps) {
   };
   
   return (
-    <View style={styles.cell}>
+    <TouchableOpacity 
+      style={styles.cell}
+      onPress={() => onPress?.(date)}
+      disabled={isFutureDate}
+    >
       <View 
         style={[
           styles.cellContent,
-          isCurrentDay && styles.today
+          isCurrentDay && styles.today,
+          isFutureDate && styles.futureDate
         ]}
       >
         <Text 
@@ -47,7 +54,7 @@ export default function ScoreCell({ date, score }: ScoreCellProps) {
           </View>
         )}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
@@ -69,6 +76,9 @@ const styles = StyleSheet.create({
   today: {
     borderColor: COLORS.primary,
     borderWidth: 2,
+  },
+  futureDate: {
+    opacity: 0.5,
   },
   dayText: {
     fontFamily: 'Inter-Medium',
