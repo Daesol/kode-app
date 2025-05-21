@@ -31,7 +31,7 @@ export default function CalendarLayout({
 
   const handleScoreSubmit = (score: number) => {
     if (selectedDate) {
-      addScore(score);
+      addScore(score, selectedDate);
       setShowRating(false);
       setSelectedDate(null);
     }

@@ -14,7 +14,7 @@ export default function TabLayout() {
   const todayScore = getTodayScore();
 
   const handleScoreSubmit = (score: number) => {
-    addScore(score);
+    addScore(score, new Date());
     setShowRating(false);
   };
 
@@ -67,7 +67,7 @@ export default function TabLayout() {
                 onPress={() => setShowRating(true)}
               >
                 <View style={[
-                  styles.rateButtonInner,
+                  styles.rateButtonInner
                 ]}>
                   <Calendar
                     size={24}

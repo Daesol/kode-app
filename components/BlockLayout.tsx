@@ -72,7 +72,7 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
 
   const handleScoreSubmit = (score: number) => {
     if (selectedDate) {
-      addScore(score);
+      addScore(score, selectedDate);
       setShowRating(false);
       setSelectedDate(null);
     }
