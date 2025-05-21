@@ -1,19 +1,16 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { COLORS } from '@/constants/theme';
-import { format, isToday, isFuture } from 'date-fns';
-import { useTrack } from '@/context/TrackContext';
+import { COLORS, FONT } from '@/constants/theme';
+import { format, isToday } from 'date-fns';
 
 type ScoreCellProps = {
   date: Date;
   score: number | null;
-  onRate?: () => void;
 };
 
-export default function ScoreCell({ date, score, onRate }: ScoreCellProps) {
+export default function ScoreCell({ date, score }: ScoreCellProps) {
   const day = date.getDate();
   const isCurrentDay = isToday(date);
-  const isFutureDate = isFuture(date);
   
   const getScoreColor = (value: number) => {
     if (value <= 25) return COLORS.scoreLow;
@@ -23,11 +20,7 @@ export default function ScoreCell({ date, score, onRate }: ScoreCellProps) {
   };
   
   return (
-    <TouchableOpacity 
-      style={styles.cell}
-      onPress={onRate}
-      disabled={isFutureDate || score !== null}
-    >
+    <View style={styles.cell}>
       <View 
         style={[
           styles.cellContent,
@@ -54,47 +47,48 @@ export default function ScoreCell({ date, score, onRate }: ScoreCellProps) {
           </View>
         )}
       </View>
-    </TouchableOpacity>
+    </View>
   );
 }
 
-// Add the StyleSheet definition here
 const styles = StyleSheet.create({
   cell: {
+    width: '14.28%', // 100% / 7 days
+    aspectRatio: 1,
     padding: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   cellContent: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
+    backgroundColor: COLORS.cardBackground,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.borderColor,
   },
   today: {
-    backgroundColor: COLORS.primary,
+    borderColor: COLORS.primary,
+    borderWidth: 2,
   },
   dayText: {
+    fontFamily: 'Inter-Medium',
     fontSize: 14,
-    fontWeight: '500',
+    color: COLORS.textPrimary,
   },
   todayText: {
-    color: 'white',
+    color: COLORS.primary,
   },
   scoreIndicator: {
-    position: 'absolute',
-    bottom: -4,
-    right: -4,
-    width: 20,
-    height: 20,
-    borderRadius: 10,
+    width: '80%',
+    paddingVertical: 2,
+    borderRadius: 4,
+    marginTop: 4,
     alignItems: 'center',
     justifyContent: 'center',
   },
   scoreText: {
-    fontSize: 10,
-    color: 'white',
-    fontWeight: 'bold',
+    fontFamily: 'Inter-Medium',
+    fontSize: 11,
+    color: COLORS.textPrimary,
   },
 });

@@ -1,11 +1,9 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS } from '@/constants/theme';
 import { format, startOfMonth } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import ScoreCell from '@/components/ScoreCell';
-import ScoreInput from '@/components/ScoreInput';
-import { useTrack } from '@/context/TrackContext';
 
 type CalendarLayoutProps = {
   currentMonth: Date;
@@ -20,24 +18,6 @@ export default function CalendarLayout({
   onPrevMonth,
   onNextMonth
 }: CalendarLayoutProps) {
-  const [showRating, setShowRating] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const { addScore } = useTrack();
-
-  const handleCellPress = (date: Date) => {
-    setSelectedDate(date);
-    setShowRating(true);
-  };
-
-  const handleRatingSubmit = (score: number) => {
-    if (selectedDate) {
-      const dateString = format(selectedDate, 'yyyy-MM-dd');
-      addScore(score);
-    }
-    setShowRating(false);
-    setSelectedDate(null);
-  };
-
   const renderMonthDays = () => {
     const monthStart = startOfMonth(currentMonth);
     const monthStartDay = monthStart.getDay();
@@ -67,8 +47,7 @@ export default function CalendarLayout({
         <ScoreCell 
           key={dateString}
           date={date}
-          score={score}
-          onRate={() => handleCellPress(date)}
+          score={score} 
         />
       );
     }
@@ -106,16 +85,6 @@ export default function CalendarLayout({
           {renderMonthDays()}
         </View>
       </View>
-
-      {showRating && (
-        <ScoreInput
-          onSubmit={handleRatingSubmit}
-          onCancel={() => {
-            setShowRating(false);
-            setSelectedDate(null);
-          }}
-        />
-      )}
     </View>
   );
 }
@@ -123,36 +92,38 @@ export default function CalendarLayout({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
-    padding: 16,
   },
   monthSelector: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    marginTop: 10,
+    marginBottom: 15,
   },
   monthButton: {
     padding: 8,
   },
   monthTitle: {
+    fontFamily: 'Inter-Bold',
     fontSize: 18,
-    fontWeight: '600',
     color: COLORS.textPrimary,
   },
   weekdaysContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 8,
+    paddingHorizontal: 12,
+    marginBottom: 10,
   },
   weekdayText: {
-    color: COLORS.textSecondary,
-    fontSize: 14,
-    width: 40,
+    flex: 1,
     textAlign: 'center',
+    fontFamily: 'Inter-Medium',
+    fontSize: 14,
+    color: COLORS.textSecondary,
   },
   gridContainer: {
     flex: 1,
+    paddingHorizontal: 12,
   },
   grid: {
     flexDirection: 'row',
@@ -161,5 +132,6 @@ const styles = StyleSheet.create({
   emptyDay: {
     width: '14.28%',
     aspectRatio: 1,
-  }
+    padding: 2,
+  },
 });
