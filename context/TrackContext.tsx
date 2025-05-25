@@ -27,7 +27,7 @@ type TrackContextType = {
   scores: ScoresState;
   reminderTime: ReminderTimeState;
   addScore: (data: RatingData, date?: Date) => void;
-  getTodayScore: () => ScoreEntry | null;
+  getTodayScore: () => ScoreEntry | undefined;  // Changed return type to be more explicit
   getWeekAverage: () => number;
   getAllTimeAverage: () => number;
   getStreak: () => number;
@@ -76,9 +76,9 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }));
   };
   
-  const getTodayScore = (): ScoreEntry | null => {
+  const getTodayScore = (): ScoreEntry | undefined => {  // Changed return type to be more explicit
     const today = format(new Date(), 'yyyy-MM-dd');
-    return scores[today] || null;
+    return scores[today];
   };
   
   const getWeekAverage = (): number => {
