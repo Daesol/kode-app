@@ -7,9 +7,15 @@ import ScoreCell from '@/components/ScoreCell';
 import ScoreInput from '@/components/ScoreInput';
 import { useTrack } from '@/context/TrackContext';
 
+type ScoreEntry = {
+  score: number;
+  difficulty: number;
+  reflection?: string;
+};
+
 type CalendarLayoutProps = {
   currentMonth: Date;
-  scores: Record<string, number | { score: number; difficulty?: any }>;
+  scores: Record<string, ScoreEntry>;
   onPrevMonth: () => void;
   onNextMonth: () => void;
 };
@@ -31,7 +37,8 @@ export default function CalendarLayout({
 
   const handleScoreSubmit = (data: { score: number; difficulty: number; reflection?: string }) => {
     if (selectedDate) {
-      addScore(data.score, selectedDate);
+      // Store the full object
+      addScore(data, selectedDate);
       setShowRating(false);
       setSelectedDate(null);
     }
@@ -61,11 +68,8 @@ export default function CalendarLayout({
       const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
       const dateString = format(date, 'yyyy-MM-dd');
       const scoreData = scores[dateString];
-      
-      // Extract numeric score if it's an object
-      const score = typeof scoreData === 'object' && scoreData !== null
-        ? scoreData.score
-        : scoreData || null;
+      // Extract numeric score from the entry
+      const score = scoreData?.score || null;
       
       days.push(
         <ScoreCell 
