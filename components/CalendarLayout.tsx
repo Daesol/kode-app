@@ -14,7 +14,7 @@ type CalendarLayoutProps = {
   onNextMonth: () => void;
 };
 
-export function CalendarLayout({ 
+export default function CalendarLayout({ 
   currentMonth, 
   scores,
   onPrevMonth,
@@ -165,5 +165,3 @@ const styles = StyleSheet.create({
     padding: 2,
   },
 });
-
-export default CalendarLayout;
