@@ -2,8 +2,20 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Platform } from 'react-native';
 import { format, subDays, differenceInDays, isSameDay } from 'date-fns';
 
+type RatingData = {
+  score: number;
+  difficulty: number;
+  reflection?: string;
+};
+
+type ScoreEntry = {
+  score: number;
+  difficulty: number;
+  reflection?: string;
+};
+
 type ScoresState = {
-  [date: string]: number;
+  [date: string]: ScoreEntry;
 };
 
 type ReminderTimeState = {
@@ -14,8 +26,8 @@ type ReminderTimeState = {
 type TrackContextType = {
   scores: ScoresState;
   reminderTime: ReminderTimeState;
-  addScore: (score: number, date?: Date) => void;
-  getTodayScore: () => number | null;
+  addScore: (data: RatingData, date?: Date) => void;
+  getTodayScore: () => ScoreEntry | null;
   getWeekAverage: () => number;
   getAllTimeAverage: () => number;
   getStreak: () => number;
@@ -31,21 +43,18 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const [scores, setScores] = useState<ScoresState>({});
   const [reminderTime, setReminderTime] = useState<ReminderTimeState>({ hours: 21, minutes: 0 });
   
-  // Load saved data on initial render
   useEffect(() => {
     const loadSavedData = async () => {
       try {
-        // For demo purposes, we'll initialize with some sample data
-        // In a real app, you would load from AsyncStorage or another persistence method
         const today = format(new Date(), 'yyyy-MM-dd');
         const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
         const twoDaysAgo = format(subDays(new Date(), 2), 'yyyy-MM-dd');
         const threeDaysAgo = format(subDays(new Date(), 3), 'yyyy-MM-dd');
         
         setScores({
-          [threeDaysAgo]: 65,
-          [twoDaysAgo]: 78,
-          [yesterday]: 82,
+          [threeDaysAgo]: { score: 65, difficulty: 3 },
+          [twoDaysAgo]: { score: 78, difficulty: 2 },
+          [yesterday]: { score: 82, difficulty: 1 },
         });
       } catch (error) {
         console.error('Failed to load saved data', error);
@@ -55,29 +64,30 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     loadSavedData();
   }, []);
   
-  // Add a new score for a specific date
-  const addScore = (score: number, date: Date = new Date()) => {
+  const addScore = (data: RatingData, date: Date = new Date()) => {
     const dateString = format(date, 'yyyy-MM-dd');
     setScores(prev => ({
       ...prev,
-      [dateString]: score,
+      [dateString]: {
+        score: data.score,
+        difficulty: data.difficulty,
+        reflection: data.reflection,
+      },
     }));
   };
   
-  // Get today's score if it exists
-  const getTodayScore = (): number | null => {
+  const getTodayScore = (): ScoreEntry | null => {
     const today = format(new Date(), 'yyyy-MM-dd');
     return scores[today] || null;
   };
   
-  // Calculate the average score for the past 7 days
   const getWeekAverage = (): number => {
     const dates = Array.from({ length: 7 }, (_, i) => 
       format(subDays(new Date(), i), 'yyyy-MM-dd')
     );
     
     const weekScores = dates
-      .map(date => scores[date])
+      .map(date => scores[date]?.score)
       .filter(score => typeof score === 'number') as number[];
     
     if (weekScores.length === 0) return 0;
@@ -86,16 +96,14 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return sum / weekScores.length;
   };
   
-  // Calculate all-time average score
   const getAllTimeAverage = (): number => {
-    const allScores = Object.values(scores);
+    const allScores = Object.values(scores).map(entry => entry.score);
     if (allScores.length === 0) return 0;
     
     const sum = allScores.reduce((acc, score) => acc + score, 0);
     return sum / allScores.length;
   };
   
-  // Calculate current streak
   const getStreak = (): number => {
     let streak = 0;
     let currentDate = new Date();
@@ -113,7 +121,6 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return streak;
   };
   
-  // Calculate completion rate (percentage of days tracked in last 30 days)
   const getCompletionRate = (): number => {
     const today = new Date();
     let trackedDays = 0;
@@ -128,28 +135,23 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return (trackedDays / 30) * 100;
   };
   
-  // Get data for weekly chart
   const getWeeklyData = (): number[] => {
     const weekData: number[] = [];
     
     for (let i = 6; i >= 0; i--) {
       const date = format(subDays(new Date(), i), 'yyyy-MM-dd');
-      weekData.push(scores[date] || 0);
+      weekData.push(scores[date]?.score || 0);
     }
     
     return weekData;
   };
   
-  // Update reminder time
   const updateReminderTime = (time: ReminderTimeState) => {
     setReminderTime(time);
-    // In a real app, you would save to AsyncStorage and schedule notifications here
   };
   
-  // Clear all scores
   const clearAllScores = () => {
     setScores({});
-    // In a real app, you would clear from AsyncStorage here
   };
   
   return (
