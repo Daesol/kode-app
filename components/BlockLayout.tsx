@@ -5,14 +5,14 @@ import { format, subDays, isAfter, isBefore, parseISO, isToday } from 'date-fns'
 import ScoreInput from './ScoreInput';
 import { useTrack } from '@/context/TrackContext';
 
-type ScoreData = {
+type ScoreEntry = {
   score: number;
-  difficulty?: number;
+  difficulty: number;
   reflection?: string;
 };
 
 type BlockLayoutProps = {
-  scores: Record<string, number | ScoreData>;
+  scores: Record<string, ScoreEntry>;
 };
 
 const GRID_PADDING = 12;
@@ -61,10 +61,8 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
     findStartDate();
   }, [scores, today]);
 
-  const getScoreValue = (scoreData: number | ScoreData | null): number | null => {
-    if (scoreData === null) return null;
-    if (typeof scoreData === 'number') return scoreData;
-    return scoreData.score;
+  const getScoreValue = (scoreEntry: ScoreEntry | undefined): number | null => {
+    return scoreEntry?.score || null;
   };
 
   const getScoreColor = (score: number | null) => {
@@ -84,7 +82,8 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
 
   const handleScoreSubmit = (data: { score: number; difficulty: number; reflection?: string }) => {
     if (selectedDate) {
-      addScore(data.score, selectedDate);
+      // Store the full object
+      addScore(data, selectedDate);
       setShowRating(false);
       setSelectedDate(null);
     }
@@ -97,8 +96,8 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
     // Generate blocks for 30 days starting from startDate
     for (let i = 0; i < TOTAL_BLOCKS; i++) {
       const dateString = format(currentDate, 'yyyy-MM-dd');
-      const scoreData = scores[dateString] || null;
-      const scoreValue = getScoreValue(scoreData);
+      const scoreEntry = scores[dateString];
+      const scoreValue = getScoreValue(scoreEntry);
       const formattedDate = format(currentDate, 'M/d');
       const isRatable = !isAfter(currentDate, today);
       const isCurrentDay = isToday(currentDate);
