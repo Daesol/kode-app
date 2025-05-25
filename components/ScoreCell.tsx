@@ -3,14 +3,15 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS } from '@/constants/theme';
 import { format, isToday, isAfter } from 'date-fns';
 
-type ScoreData = {
+type ScoreEntry = {
   score: number;
-  difficulty?: any; // adjust type as needed
+  difficulty: number;
+  reflection?: string;
 };
 
 type ScoreCellProps = {
   date: Date;
-  score: number | ScoreData | null;
+  score: number | ScoreEntry | null;
   onPress?: (date: Date) => void;
 };
 
@@ -22,7 +23,7 @@ export default function ScoreCell({ date, score, onPress }: ScoreCellProps) {
   // Extract the numeric score value
   const scoreValue = typeof score === 'object' && score !== null 
     ? score.score 
-    : score;
+    : typeof score === 'number' ? score : null;
   
   const getScoreColor = (value: number) => {
     if (value <= 25) return COLORS.scoreLow;
@@ -53,7 +54,7 @@ export default function ScoreCell({ date, score, onPress }: ScoreCellProps) {
           {day}
         </Text>
         
-        {scoreValue !== null && typeof scoreValue === 'number' && (
+        {scoreValue !== null && (
           <View 
             style={[
               styles.scoreIndicator,
