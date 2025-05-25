@@ -5,7 +5,7 @@ import { COLORS } from '@/constants/theme';
 import { useTrack } from '@/context/TrackContext';
 import { subMonths, addMonths, getMonth, getYear } from 'date-fns';
 import Header from '@/components/Header';
-import { CalendarLayout } from '@/components/CalendarLayout';
+import CalendarLayout from '@/components/CalendarLayout';
 import BlockLayout from '@/components/BlockLayout';
 import { LayoutGrid, Calendar } from 'lucide-react-native';
 
@@ -42,7 +42,7 @@ export default function HistoryScreen() {
           )}
         </TouchableOpacity>
       </View>
-
+      
       {viewMode === 'calendar' ? (
         <CalendarLayout
           currentMonth={currentMonth}
