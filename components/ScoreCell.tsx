@@ -53,7 +53,7 @@ export default function ScoreCell({ date, score, onPress }: ScoreCellProps) {
           {day}
         </Text>
         
-        {scoreValue !== null && (
+        {scoreValue !== null && typeof scoreValue === 'number' && (
           <View 
             style={[
               styles.scoreIndicator,
