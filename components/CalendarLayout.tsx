@@ -9,7 +9,7 @@ import { useTrack } from '@/context/TrackContext';
 
 type CalendarLayoutProps = {
   currentMonth: Date;
-  scores: Record<string, number>;
+  scores: Record<string, number | { score: number; difficulty?: any }>;
   onPrevMonth: () => void;
   onNextMonth: () => void;
 };
@@ -60,7 +60,12 @@ export default function CalendarLayout({
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
       const dateString = format(date, 'yyyy-MM-dd');
-      const score = scores[dateString] || null;
+      const scoreData = scores[dateString];
+      
+      // Extract numeric score if it's an object
+      const score = typeof scoreData === 'object' && scoreData !== null
+        ? scoreData.score
+        : scoreData || null;
       
       days.push(
         <ScoreCell 
