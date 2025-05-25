@@ -29,9 +29,9 @@ export default function CalendarLayout({
     setShowRating(true);
   };
 
-  const handleScoreSubmit = (score: number) => {
+  const handleScoreSubmit = (data: { score: number; difficulty: number; reflection?: string }) => {
     if (selectedDate) {
-      addScore(score, selectedDate);
+      addScore(data.score, selectedDate);
       setShowRating(false);
       setSelectedDate(null);
     }
