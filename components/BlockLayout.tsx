@@ -5,8 +5,14 @@ import { format, subDays, isAfter, isBefore, parseISO, isToday } from 'date-fns'
 import ScoreInput from './ScoreInput';
 import { useTrack } from '@/context/TrackContext';
 
+type ScoreData = {
+  score: number;
+  difficulty?: number;
+  reflection?: string;
+};
+
 type BlockLayoutProps = {
-  scores: Record<string, number>;
+  scores: Record<string, number | ScoreData>;
 };
 
 const GRID_PADDING = 12;
@@ -55,6 +61,12 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
     findStartDate();
   }, [scores, today]);
 
+  const getScoreValue = (scoreData: number | ScoreData | null): number | null => {
+    if (scoreData === null) return null;
+    if (typeof scoreData === 'number') return scoreData;
+    return scoreData.score;
+  };
+
   const getScoreColor = (score: number | null) => {
     if (score === null) return COLORS.cardBackground;
     if (score <= 25) return COLORS.scoreLow;
@@ -70,9 +82,9 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
     }
   };
 
-  const handleScoreSubmit = (score: number) => {
+  const handleScoreSubmit = (data: { score: number; difficulty: number; reflection?: string }) => {
     if (selectedDate) {
-      addScore(score, selectedDate);
+      addScore(data.score, selectedDate);
       setShowRating(false);
       setSelectedDate(null);
     }
@@ -85,7 +97,8 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
     // Generate blocks for 30 days starting from startDate
     for (let i = 0; i < TOTAL_BLOCKS; i++) {
       const dateString = format(currentDate, 'yyyy-MM-dd');
-      const score = scores[dateString] || null;
+      const scoreData = scores[dateString] || null;
+      const scoreValue = getScoreValue(scoreData);
       const formattedDate = format(currentDate, 'M/d');
       const isRatable = !isAfter(currentDate, today);
       const isCurrentDay = isToday(currentDate);
@@ -102,15 +115,15 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
               { 
                 width: itemSize,
                 height: itemSize,
-                backgroundColor: getScoreColor(score),
+                backgroundColor: getScoreColor(scoreValue),
                 opacity: isRatable ? 1 : 0.5,
                 borderColor: isCurrentDay ? COLORS.primary : COLORS.borderColor,
                 borderWidth: isCurrentDay ? 2 : 1,
               }
             ]}
           >
-            {score !== null ? (
-              <Text style={[styles.scoreText, { fontSize: itemSize * 0.3 }]}>{score}</Text>
+            {scoreValue !== null ? (
+              <Text style={[styles.scoreText, { fontSize: itemSize * 0.3 }]}>{scoreValue}</Text>
             ) : (
               <Text style={[styles.dateText, { fontSize: itemSize * 0.25 }]}>{formattedDate}</Text>
             )}
