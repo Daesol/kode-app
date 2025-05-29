@@ -21,13 +21,12 @@ type ScoreEntry = {
 
 type ScoreOverlayProps = {
   date: Date;
-  scoreData?: ScoreEntry;  // Make scoreData optional
+  scoreData?: ScoreEntry;
   onClose: () => void;
   onEdit: () => void;
 };
 
 export default function ScoreOverlay({ date, scoreData, onClose, onEdit }: ScoreOverlayProps) {
-  // Early return if no score data
   if (!scoreData) {
     return null;
   }
@@ -52,7 +51,7 @@ export default function ScoreOverlay({ date, scoreData, onClose, onEdit }: Score
 
   return (
     <Modal transparent={true} animationType="fade">
-      <View style={styles.modalOverlay}>
+      <View style={styles.container}>
         {Platform.OS === 'ios' ? (
           <BlurView intensity={20} style={StyleSheet.absoluteFill} tint="dark" />
         ) : (
@@ -62,43 +61,54 @@ export default function ScoreOverlay({ date, scoreData, onClose, onEdit }: Score
         <View style={styles.modalContent}>
           <View style={styles.header}>
             <Text style={styles.date}>{format(date, 'MMMM d, yyyy')}</Text>
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+            <TouchableOpacity 
+              style={styles.closeButton} 
+              onPress={onClose}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
               <X size={24} color={COLORS.textPrimary} />
             </TouchableOpacity>
           </View>
 
           <ScrollView 
-            style={styles.scrollContent}
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollContent}
             showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContentContainer}
           >
-            <View style={styles.scoreSection}>
-              <Text style={styles.label}>Effort Score</Text>
-              <Text style={[styles.scoreValue, { color: getScoreColor(scoreData.score) }]}>
-                {scoreData.score}
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Effort Score</Text>
+              <View style={styles.scoreContainer}>
+                <Text style={[styles.scoreValue, { color: getScoreColor(scoreData.score) }]}>
+                  {scoreData.score}
+                </Text>
                 <Text style={styles.scoreMax}>/100</Text>
-              </Text>
+              </View>
             </View>
 
-            <View style={styles.difficultySection}>
-              <Text style={styles.label}>Perceived Difficulty</Text>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Perceived Difficulty</Text>
               <Text style={styles.difficultyValue}>
                 {getDifficultyLabel(scoreData.difficulty)}
               </Text>
             </View>
 
             {scoreData.reflection && scoreData.reflection.length > 0 && (
-              <View style={styles.reflectionSection}>
-                <Text style={styles.label}>Reflection</Text>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Reflection</Text>
                 <Text style={styles.reflectionText}>{scoreData.reflection}</Text>
               </View>
             )}
           </ScrollView>
 
-          <TouchableOpacity style={styles.editButton} onPress={onEdit}>
-            <Edit3 size={20} color={COLORS.textPrimary} style={styles.editIcon} />
-            <Text style={styles.editButtonText}>Edit Entry</Text>
-          </TouchableOpacity>
+          <View style={styles.footer}>
+            <TouchableOpacity 
+              style={styles.editButton} 
+              onPress={onEdit}
+            >
+              <Edit3 size={20} color={COLORS.textPrimary} style={styles.editIcon} />
+              <Text style={styles.editButtonText}>Edit Entry</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </Modal>
@@ -106,27 +116,30 @@ export default function ScoreOverlay({ date, scoreData, onClose, onEdit }: Score
 }
 
 const styles = StyleSheet.create({
-  modalOverlay: {
+  container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },
   modalContent: {
-    backgroundColor: COLORS.cardBackground,
-    borderRadius: 16,
     width: '100%',
     maxWidth: 400,
     maxHeight: '80%',
+    backgroundColor: COLORS.cardBackground,
+    borderRadius: 16,
     borderWidth: 1,
     borderColor: COLORS.borderColor,
+    overflow: 'hidden',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 24,
-    paddingBottom: 0,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderColor,
   },
   date: {
     fontFamily: 'Inter-Bold',
@@ -136,21 +149,24 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 4,
   },
+  scrollView: {
+    maxHeight: '70%',
+  },
   scrollContent: {
-    flex: 1,
+    padding: 20,
   },
-  scrollContentContainer: {
-    padding: 24,
-    paddingTop: 20,
-  },
-  scoreSection: {
+  section: {
     marginBottom: 24,
   },
-  label: {
+  sectionTitle: {
     fontFamily: 'Inter-Medium',
     fontSize: 16,
     color: COLORS.textSecondary,
     marginBottom: 8,
+  },
+  scoreContainer: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
   },
   scoreValue: {
     fontFamily: 'Inter-Bold',
@@ -160,23 +176,23 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
     fontSize: 24,
     color: COLORS.textSecondary,
-  },
-  difficultySection: {
-    marginBottom: 24,
+    marginLeft: 4,
   },
   difficultyValue: {
     fontFamily: 'Inter-Bold',
     fontSize: 24,
     color: COLORS.textPrimary,
   },
-  reflectionSection: {
-    marginBottom: 24,
-  },
   reflectionText: {
     fontFamily: 'Inter-Regular',
     fontSize: 16,
     color: COLORS.textPrimary,
     lineHeight: 24,
+  },
+  footer: {
+    padding: 20,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.borderColor,
   },
   editButton: {
     flexDirection: 'row',
@@ -185,8 +201,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     padding: 16,
     borderRadius: 12,
-    margin: 24,
-    marginTop: 0,
   },
   editIcon: {
     marginRight: 8,
