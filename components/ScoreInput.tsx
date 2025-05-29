@@ -8,7 +8,9 @@ import {
   Animated,
   Platform,
   Dimensions,
-  TextInput
+  TextInput,
+  KeyboardAvoidingView,
+  ScrollView
 } from 'react-native';
 import { COLORS, SHADOW } from '@/constants/theme';
 import { BlurView } from 'expo-blur';
@@ -347,41 +349,51 @@ const ScoreInput: React.FC<ScoreInputProps> = ({ initialData, onSubmit, onCancel
           <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.7)' }]} />
         )}
         
-        <Animated.View 
-          style={[
-            styles.modalContent,
-            { transform: [{ translateY }], opacity }
-          ]}
+        <KeyboardAvoidingView 
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardAvoidingView}
         >
-          {step !== 'score' && (
-            <TouchableOpacity 
-              style={styles.backButton}
-              onPress={handleBack}
-            >
-              <ChevronLeft size={24} color={COLORS.textPrimary} />
-            </TouchableOpacity>
-          )}
-          
-          {renderStepContent()}
-          
-          <View style={styles.buttonRow}>
-            <TouchableOpacity 
-              style={[styles.button, styles.cancelButton]}
-              onPress={handleClose}
-            >
-              <Text style={styles.cancelButtonText}>Cancel</Text>
-            </TouchableOpacity>
+          <Animated.View 
+            style={[
+              styles.modalContent,
+              { transform: [{ translateY }], opacity }
+            ]}
+          >
+            {step !== 'score' && (
+              <TouchableOpacity 
+                style={styles.backButton}
+                onPress={handleBack}
+              >
+                <ChevronLeft size={24} color={COLORS.textPrimary} />
+              </TouchableOpacity>
+            )}
             
-            <TouchableOpacity 
-              style={[styles.button, styles.submitButton]}
-              onPress={step === 'reflection' ? handleSubmit : handleNext}
+            <ScrollView 
+              contentContainerStyle={styles.scrollContent}
+              keyboardShouldPersistTaps="handled"
             >
-              <Text style={styles.submitButtonText}>
-                {step === 'reflection' ? 'Save' : 'Next'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </Animated.View>
+              {renderStepContent()}
+            </ScrollView>
+            
+            <View style={styles.buttonRow}>
+              <TouchableOpacity 
+                style={[styles.button, styles.cancelButton]}
+                onPress={handleClose}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.button, styles.submitButton]}
+                onPress={step === 'reflection' ? handleSubmit : handleNext}
+              >
+                <Text style={styles.submitButtonText}>
+                  {step === 'reflection' ? 'Save' : 'Next'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </Animated.View>
+        </KeyboardAvoidingView>
       </GestureHandlerRootView>
     </Modal>
   );
@@ -392,12 +404,18 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-end',
   },
+  keyboardAvoidingView: {
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
   modalContent: {
     backgroundColor: COLORS.cardBackground,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    padding: 24,
     ...SHADOW.medium,
+  },
+  scrollContent: {
+    padding: 24,
   },
   backButton: {
     position: 'absolute',
@@ -509,6 +527,8 @@ const styles = StyleSheet.create({
   buttonRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    padding: 24,
+    paddingTop: 0,
   },
   button: {
     flex: 1,
