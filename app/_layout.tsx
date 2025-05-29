@@ -33,6 +33,11 @@ function AppContent() {
     }
   }, [fontsLoaded, fontError]);
 
+  useEffect(() => {
+    console.log("Current segments:", segments);
+    console.log("Is authenticated:", isAuthenticated);
+  }, [segments, isAuthenticated]);
+
   const handleAnimationComplete = () => {
     if (!hasNavigated.current) {
       console.log("Animation complete, navigating...");
