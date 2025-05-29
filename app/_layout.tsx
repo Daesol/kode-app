@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
@@ -39,7 +39,7 @@ function AppContent() {
       hasNavigated.current = true;
       setShowSplash(false);
       
-      const route = isAuthenticated ? '/(tabs)/history' : '/(auth)/login';
+      const route = isAuthenticated ? '/(tabs)/home' : '/(auth)/login';
       console.log("Navigating to:", route);
       
       setTimeout(() => {
