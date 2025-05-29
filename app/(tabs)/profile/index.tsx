@@ -1,17 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/theme';
 import { useRouter } from 'expo-router';
-import { Settings, CircleHelp as HelpCircle } from 'lucide-react-native';
+import { Settings, CircleHelp as HelpCircle, LayoutGrid, Calendar } from 'lucide-react-native';
 import { useTrack } from '@/context/TrackContext';
 import CalendarLayout from '@/components/CalendarLayout';
+import BlockLayout from '@/components/BlockLayout';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { width } = useWindowDimensions();
   const { scores, getStreak, getCompletionRate, getAllTimeAverage } = useTrack();
+  const [viewMode, setViewMode] = useState<'calendar' | 'block'>('calendar');
   
   // Calculate responsive font size for stat labels
   const getStatLabelSize = () => {
@@ -25,6 +27,16 @@ export default function ProfileScreen() {
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Profile</Text>
         <View style={styles.headerIcons}>
+          <TouchableOpacity 
+            style={styles.headerIcon} 
+            onPress={() => setViewMode(prev => prev === 'calendar' ? 'block' : 'calendar')}
+          >
+            {viewMode === 'calendar' ? (
+              <LayoutGrid size={24} color={COLORS.textPrimary} />
+            ) : (
+              <Calendar size={24} color={COLORS.textPrimary} />
+            )}
+          </TouchableOpacity>
           <TouchableOpacity 
             style={styles.headerIcon} 
             onPress={() => router.push('/profile/support')}
@@ -73,13 +85,17 @@ export default function ProfileScreen() {
           </View>
         </View>
 
-        <View style={styles.calendarSection}>
-          <CalendarLayout
-            currentMonth={new Date()}
-            scores={scores}
-            onPrevMonth={() => {}}
-            onNextMonth={() => {}}
-          />
+        <View style={styles.trackingSection}>
+          {viewMode === 'calendar' ? (
+            <CalendarLayout
+              currentMonth={new Date()}
+              scores={scores}
+              onPrevMonth={() => {}}
+              onNextMonth={() => {}}
+            />
+          ) : (
+            <BlockLayout scores={scores} />
+          )}
         </View>
       </ScrollView>
     </View>
@@ -184,7 +200,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.borderColor,
     marginHorizontal: 16,
   },
-  calendarSection: {
+  trackingSection: {
     flex: 1,
     paddingTop: 20,
   },
