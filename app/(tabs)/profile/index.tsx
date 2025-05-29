@@ -3,13 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/theme';
 import { useRouter } from 'expo-router';
-import { LogOut, Settings, CircleHelp as HelpCircle } from 'lucide-react-native';
-import { useAuth } from '@/context/AuthContext';
+import { Settings, CircleHelp as HelpCircle } from 'lucide-react-native';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { logout } = useAuth();
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -62,16 +60,6 @@ export default function ProfileScreen() {
               <Text style={styles.statLabel}>Avg Score</Text>
             </View>
           </View>
-        </View>
-
-        <View style={styles.section}>
-          <TouchableOpacity
-            style={styles.logoutButton}
-            onPress={logout}
-          >
-            <LogOut size={22} color={COLORS.error} style={styles.logoutIcon} />
-            <Text style={styles.logoutText}>Log Out</Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
@@ -175,26 +163,5 @@ const styles = StyleSheet.create({
     width: 1,
     backgroundColor: COLORS.borderColor,
     marginHorizontal: 16,
-  },
-  section: {
-    padding: 20,
-  },
-  logoutButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.cardBackground,
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: COLORS.borderColor,
-  },
-  logoutIcon: {
-    marginRight: 8,
-  },
-  logoutText: {
-    fontFamily: 'Inter-Medium',
-    fontSize: 16,
-    color: COLORS.error,
   },
 });

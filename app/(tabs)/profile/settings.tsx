@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Switch, TouchableOpacity } from 'react-native';
 import { COLORS } from '@/constants/theme';
-import { Bell, Moon, Shield } from 'lucide-react-native';
+import { Bell, Moon, Shield, LogOut } from 'lucide-react-native';
 import TimePickerModal from '@/components/TimePickerModal';
 import { useTrack } from '@/context/TrackContext';
+import { useAuth } from '@/context/AuthContext';
 
 export default function SettingsScreen() {
   const { reminderTime, setReminderTime } = useTrack();
+  const { logout } = useAuth();
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [darkMode, setDarkMode] = useState(true);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -106,6 +108,16 @@ export default function SettingsScreen() {
         </View>
       </View>
 
+      <View style={styles.section}>
+        <TouchableOpacity 
+          style={styles.logoutButton}
+          onPress={logout}
+        >
+          <LogOut size={22} color={COLORS.error} style={styles.logoutIcon} />
+          <Text style={styles.logoutText}>Log Out</Text>
+        </TouchableOpacity>
+      </View>
+
       {showTimePicker && (
         <TimePickerModal
           initialHours={reminderTime.hours}
@@ -173,5 +185,23 @@ const styles = StyleSheet.create({
   },
   disabledText: {
     color: COLORS.textDisabled,
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: COLORS.cardBackground,
+    borderRadius: 16,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: COLORS.borderColor,
+  },
+  logoutIcon: {
+    marginRight: 8,
+  },
+  logoutText: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 16,
+    color: COLORS.error,
   },
 });
