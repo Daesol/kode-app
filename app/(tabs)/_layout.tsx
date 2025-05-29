@@ -1,17 +1,11 @@
-import { Tabs, usePathname } from 'expo-router';
-import { useEffect } from 'react';
+import { Tabs } from 'expo-router';
 import { Home, Users, Calendar, User } from 'lucide-react-native';
 import { COLORS } from '@/constants/theme';
 
 export default function TabLayout() {
-  const pathname = usePathname();
-  
-  useEffect(() => {
-    console.log("Current pathname in tabs:", pathname);
-  }, [pathname]);
-
   return (
     <Tabs
+      initialRouteName="home"
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
@@ -22,12 +16,6 @@ export default function TabLayout() {
         tabBarInactiveTintColor: COLORS.textSecondary,
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          href: null, // Hide the index tab
-        }}
-      />
       <Tabs.Screen
         name="home"
         options={{
