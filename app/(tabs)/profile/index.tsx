@@ -16,13 +16,6 @@ export default function ProfileScreen() {
   const { scores, getStreak, getCompletionRate, getAllTimeAverage } = useTrack();
   const [viewMode, setViewMode] = useState<'calendar' | 'block'>('calendar');
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  
-  // Calculate responsive font size for stat labels
-  const getStatLabelSize = () => {
-    if (width < 350) return 11;
-    if (width < 400) return 12;
-    return 13;
-  };
 
   const handlePrevMonth = () => {
     setCurrentMonth(prev => subMonths(prev, 1));
@@ -34,31 +27,57 @@ export default function ProfileScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
+      {/* Compact Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Profile</Text>
+        <View style={styles.headerLeft}>
+          <View style={styles.avatarSmall}>
+            <Text style={styles.avatarSmallText}>JD</Text>
+          </View>
+          <View style={styles.headerInfo}>
+            <Text style={styles.headerName}>John Doe</Text>
+            <Text style={styles.headerEmail}>demo@example.com</Text>
+          </View>
+        </View>
+        
         <View style={styles.headerIcons}>
           <TouchableOpacity 
             style={styles.headerIcon} 
             onPress={() => setViewMode(prev => prev === 'calendar' ? 'block' : 'calendar')}
           >
             {viewMode === 'calendar' ? (
-              <LayoutGrid size={24} color={COLORS.textPrimary} />
+              <LayoutGrid size={20} color={COLORS.textPrimary} />
             ) : (
-              <Calendar size={24} color={COLORS.textPrimary} />
+              <Calendar size={20} color={COLORS.textPrimary} />
             )}
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.headerIcon} 
             onPress={() => router.push('/profile/support')}
           >
-            <HelpCircle size={24} color={COLORS.textPrimary} />
+            <HelpCircle size={20} color={COLORS.textPrimary} />
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.headerIcon} 
             onPress={() => router.push('/profile/settings')}
           >
-            <Settings size={24} color={COLORS.textPrimary} />
+            <Settings size={20} color={COLORS.textPrimary} />
           </TouchableOpacity>
+        </View>
+      </View>
+
+      {/* Compact Stats Banner */}
+      <View style={styles.statsBanner}>
+        <View style={styles.statItem}>
+          <Text style={styles.statValue}>{getStreak()}</Text>
+          <Text style={styles.statLabel}>Days</Text>
+        </View>
+        <View style={styles.statItem}>
+          <Text style={styles.statValue}>{Math.round(getCompletionRate())}%</Text>
+          <Text style={styles.statLabel}>Complete</Text>
+        </View>
+        <View style={styles.statItem}>
+          <Text style={styles.statValue}>{getAllTimeAverage().toFixed(1)}</Text>
+          <Text style={styles.statLabel}>Avg Score</Text>
         </View>
       </View>
       
@@ -66,35 +85,7 @@ export default function ProfileScreen() {
         style={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.profileSection}>
-          <View style={styles.avatarContainer}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>JD</Text>
-            </View>
-            <View style={styles.profileInfo}>
-              <Text style={styles.name}>John Doe</Text>
-              <Text style={styles.email}>demo@example.com</Text>
-            </View>
-          </View>
-
-          <View style={styles.statsContainer}>
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{getStreak()}</Text>
-              <Text style={[styles.statLabel, { fontSize: getStatLabelSize() }]}>Days Tracked</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{Math.round(getCompletionRate())}%</Text>
-              <Text style={[styles.statLabel, { fontSize: getStatLabelSize() }]}>Completion</Text>
-            </View>
-            <View style={styles.statDivider} />
-            <View style={styles.statItem}>
-              <Text style={styles.statValue}>{getAllTimeAverage().toFixed(1)}</Text>
-              <Text style={[styles.statLabel, { fontSize: getStatLabelSize() }]}>Avg Score</Text>
-            </View>
-          </View>
-        </View>
-
+        {/* Tracking Visualization */}
         <View style={styles.trackingSection}>
           {viewMode === 'calendar' ? (
             <CalendarLayout
@@ -107,6 +98,18 @@ export default function ProfileScreen() {
             <BlockLayout scores={scores} />
           )}
         </View>
+
+        {/* Reserved space for future content */}
+        <View style={styles.futureContentSpace}>
+          {/* This space is now available for additional features like:
+              - Achievement badges
+              - Goals/targets
+              - Recent activity feed
+              - Social features
+              - Settings shortcuts
+              - Insights/analytics
+          */}
+        </View>
       </ScrollView>
     </View>
   );
@@ -118,77 +121,64 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   header: {
-    height: 60,
+    height: 70,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
+    paddingHorizontal: 16,
     backgroundColor: COLORS.backgroundDark,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.borderColor,
   },
-  headerTitle: {
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  avatarSmall: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarSmallText: {
     fontFamily: 'Inter-Bold',
-    fontSize: 22,
+    fontSize: 16,
     color: COLORS.textPrimary,
+  },
+  headerInfo: {
+    marginLeft: 12,
+    flex: 1,
+  },
+  headerName: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 18,
+    color: COLORS.textPrimary,
+    lineHeight: 22,
+  },
+  headerEmail: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    lineHeight: 16,
   },
   headerIcons: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   headerIcon: {
-    marginLeft: 16,
-    padding: 4,
+    marginLeft: 12,
+    padding: 8,
   },
-  content: {
-    flex: 1,
-  },
-  profileSection: {
-    paddingVertical: 24,
-    paddingHorizontal: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: COLORS.borderColor,
-  },
-  avatarContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: COLORS.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    fontFamily: 'Inter-Bold',
-    fontSize: 32,
-    color: COLORS.textPrimary,
-  },
-  profileInfo: {
-    marginLeft: 16,
-    flex: 1,
-  },
-  name: {
-    fontFamily: 'Inter-Bold',
-    fontSize: 24,
-    color: COLORS.textPrimary,
-    marginBottom: 4,
-  },
-  email: {
-    fontFamily: 'Inter-Regular',
-    fontSize: 16,
-    color: COLORS.textSecondary,
-  },
-  statsContainer: {
+  statsBanner: {
     flexDirection: 'row',
     backgroundColor: COLORS.cardBackground,
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: COLORS.borderColor,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderColor,
   },
   statItem: {
     flex: 1,
@@ -196,22 +186,26 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontFamily: 'Inter-Bold',
-    fontSize: 20,
+    fontSize: 18,
     color: COLORS.textPrimary,
-    marginBottom: 4,
+    lineHeight: 22,
   },
   statLabel: {
     fontFamily: 'Inter-Regular',
+    fontSize: 11,
     color: COLORS.textSecondary,
-    textAlign: 'center',
+    marginTop: 2,
   },
-  statDivider: {
-    width: 1,
-    backgroundColor: COLORS.borderColor,
-    marginHorizontal: 16,
+  content: {
+    flex: 1,
   },
   trackingSection: {
-    flex: 1,
-    paddingTop: 20,
+    paddingTop: 16,
+  },
+  futureContentSpace: {
+    minHeight: 200,
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+    // This space is ready for future content
   },
 });
