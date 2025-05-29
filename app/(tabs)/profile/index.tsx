@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-nati
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/theme';
 import { useRouter } from 'expo-router';
-import { LogOut, Settings, HelpCircle } from 'lucide-react-native';
+import { LogOut, Settings, CircleHelp as HelpCircle } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 
 export default function ProfileScreen() {
