@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
-import { Chrome as Home, Users, Calendar, User } from 'lucide-react-native';
+import { Chrome as Home, Users, Calendar, User, Plus } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/theme';
 import { useTrack } from '@/context/TrackContext';
@@ -74,6 +74,18 @@ export default function TabLayout() {
         />
       </Tabs>
       
+      {/* Floating Action Button for Rating */}
+      <TouchableOpacity
+        style={[
+          styles.floatingButton,
+          { bottom: 70 + insets.bottom }
+        ]}
+        onPress={() => setShowRating(true)}
+        activeOpacity={0.8}
+      >
+        <Plus size={24} color={COLORS.textPrimary} />
+      </TouchableOpacity>
+      
       {showRating && (
         <ScoreInput
           onSubmit={handleScoreSubmit}
@@ -96,12 +108,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 5,
   },
-  rateButton: {
+  floatingButton: {
     position: 'absolute',
-    alignSelf: 'center',
-    bottom: 10,
-  },
-  rateButtonInner: {
+    right: 20,
     width: 56,
     height: 56,
     borderRadius: 28,
@@ -114,10 +123,4 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
-  rateIcon: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-  },
-}); 
+});
