@@ -39,13 +39,13 @@ export default function ProfileScreen() {
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.headerIcon} 
-            onPress={() => router.push('/profile/support')}
+            onPress={() => router.push('/(tabs)/profile/support')}
           >
             <HelpCircle size={24} color={COLORS.textPrimary} />
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.headerIcon} 
-            onPress={() => router.push('/profile/settings')}
+            onPress={() => router.push('/(tabs)/profile/settings')}
           >
             <Settings size={24} color={COLORS.textPrimary} />
           </TouchableOpacity>
