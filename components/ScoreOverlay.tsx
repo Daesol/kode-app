@@ -82,7 +82,7 @@ export default function ScoreOverlay({ date, scoreData, onClose, onEdit }: Score
               </Text>
             </View>
 
-            {scoreData.reflection && (
+            {scoreData.reflection?.length > 0 && (
               <View style={styles.reflectionSection}>
                 <Text style={styles.label}>Reflection</Text>
                 <Text style={styles.reflectionText}>{scoreData.reflection}</Text>
