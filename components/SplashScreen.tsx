@@ -16,7 +16,7 @@ export default function SplashScreen({ fontsLoaded }: SplashScreenProps) {
         style={[styles.splashTitle, !fontsLoaded && styles.fallbackFont]}
         entering={FadeIn.duration(800).delay(200)}
       >
-        Daily Tracker
+        LOCK'N
       </Animated.Text>
     </View>
   );
