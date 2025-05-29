@@ -55,33 +55,6 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen
-          name="rate"
-          options={{
-            title: '',
-            // Add href: null to exclude this from navigation
-            href: null,
-            tabBarButton: () => (
-              <TouchableOpacity
-                style={[
-                  styles.rateButton,
-                  { bottom: insets.bottom > 0 ? 20 : 10 }
-                ]}
-                onPress={() => setShowRating(true)}
-              >
-                <View style={[
-                  styles.rateButtonInner
-                ]}>
-                  <Calendar
-                    size={24}
-                    color={COLORS.textPrimary}
-                    style={styles.rateIcon}
-                  />
-                </View>
-              </TouchableOpacity>
-            ),
-          }}
-        />
-        <Tabs.Screen
           name="stats"
           options={{
             title: 'Stats',
