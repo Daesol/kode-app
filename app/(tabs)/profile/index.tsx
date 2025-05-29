@@ -53,7 +53,6 @@ export default function ProfileScreen() {
               <View style={styles.avatar}>
                 <Text style={styles.avatarText}>JD</Text>
               </View>
-              <View style={styles.statusBadge} />
             </View>
             <View style={styles.profileInfo}>
               <Text style={styles.name}>John Doe</Text>
@@ -163,17 +162,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     fontSize: 32,
     color: COLORS.textPrimary,
-  },
-  statusBadge: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: COLORS.success,
-    borderWidth: 2,
-    borderColor: COLORS.background,
   },
   profileInfo: {
     marginLeft: 16,
