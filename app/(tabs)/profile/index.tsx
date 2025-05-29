@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'rea
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/theme';
 import { useRouter } from 'expo-router';
-import { Settings, LogOut, ChevronRight, Bell, Shield, HelpCircle, Star } from 'lucide-react-native';
+import { Settings, LogOut, ChevronRight, Bell, Shield, CircleHelp as HelpCircle, Star } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
 import Header from '@/components/Header';
 
