@@ -5,8 +5,8 @@ import { format, startOfMonth } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 import ScoreCell from '@/components/ScoreCell';
 import ScoreInput from '@/components/ScoreInput';
-import ScoreOverlay from '@/components/ScoreOverlay';
 import { useTrack } from '@/context/TrackContext';
+import { useRouter } from 'expo-router';
 
 type ScoreEntry = {
   score: number;
@@ -28,18 +28,18 @@ export default function CalendarLayout({
   onNextMonth
 }: CalendarLayoutProps) {
   const [showRating, setShowRating] = useState(false);
-  const [showOverlay, setShowOverlay] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const { addScore } = useTrack();
+  const router = useRouter();
 
   const handleDayPress = (date: Date) => {
-    setSelectedDate(date);
     const dateString = format(date, 'yyyy-MM-dd');
     const existingScore = scores[dateString];
 
     if (existingScore) {
-      setShowOverlay(true);
+      router.push(`/history/${dateString}`);
     } else {
+      setSelectedDate(date);
       setShowRating(true);
     }
   };
@@ -50,11 +50,6 @@ export default function CalendarLayout({
       setShowRating(false);
       setSelectedDate(null);
     }
-  };
-
-  const handleEdit = () => {
-    setShowOverlay(false);
-    setShowRating(true);
   };
 
   const renderMonthDays = () => {
@@ -128,24 +123,11 @@ export default function CalendarLayout({
 
       {showRating && selectedDate && (
         <ScoreInput
-          initialData={selectedDate ? scores[format(selectedDate, 'yyyy-MM-dd')] : undefined}
           onSubmit={handleScoreSubmit}
           onCancel={() => {
             setShowRating(false);
             setSelectedDate(null);
           }}
-        />
-      )}
-
-      {showOverlay && selectedDate && (
-        <ScoreOverlay
-          date={selectedDate}
-          scoreData={scores[format(selectedDate, 'yyyy-MM-dd')]}
-          onClose={() => {
-            setShowOverlay(false);
-            setSelectedDate(null);
-          }}
-          onEdit={handleEdit}
         />
       )}
     </View>
