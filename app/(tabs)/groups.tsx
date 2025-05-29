@@ -22,15 +22,29 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
+  header: {
+    height: 60,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    backgroundColor: COLORS.backgroundDark,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderColor,
+  },
+  headerTitle: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 22,
+    color: COLORS.textPrimary,
+  },
   content: {
     flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     padding: 20,
   },
   comingSoon: {
     fontFamily: 'Inter-Medium',
     fontSize: 16,
     color: COLORS.textSecondary,
-    textAlign: 'center',
-    marginTop: 40,
   },
 });
