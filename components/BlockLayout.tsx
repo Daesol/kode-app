@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Dimensions, ScrollView, useWindowDimensions, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, useWindowDimensions, TouchableOpacity } from 'react-native';
 import { COLORS } from '@/constants/theme';
 import { format, subDays, isAfter, isBefore, parseISO, isToday } from 'date-fns';
 import ScoreInput from './ScoreInput';
@@ -133,7 +133,7 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
       currentDate = subDays(currentDate, -1);
     }
 
-    return blocks;
+    return <View style={[styles.grid, { gap: GRID_SPACING }]}>{blocks}</View>;
   };
 
   const handleScroll = (event: any) => {
@@ -149,9 +149,7 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
         onScroll={handleScroll}
         scrollEventThrottle={16}
       >
-        <View style={[styles.grid, { gap: GRID_SPACING }]}>
-          {renderBlocks()}
-        </View>
+        {renderBlocks()}
       </ScrollView>
 
       {showRating && (
