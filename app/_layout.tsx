@@ -39,7 +39,7 @@ function AppContent() {
       hasNavigated.current = true;
       setShowSplash(false);
       
-      const route = isAuthenticated ? '/(tabs)/history' : '/(auth)/login';
+      const route = isAuthenticated ? '/(tabs)/home' : '/(auth)/login';
       console.log("Navigating to:", route);
       
       setTimeout(() => {
