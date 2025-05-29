@@ -7,6 +7,7 @@ import { Settings, CircleHelp as HelpCircle, LayoutGrid, Calendar } from 'lucide
 import { useTrack } from '@/context/TrackContext';
 import CalendarLayout from '@/components/CalendarLayout';
 import BlockLayout from '@/components/BlockLayout';
+import { addMonths, subMonths } from 'date-fns';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -14,12 +15,21 @@ export default function ProfileScreen() {
   const { width } = useWindowDimensions();
   const { scores, getStreak, getCompletionRate, getAllTimeAverage } = useTrack();
   const [viewMode, setViewMode] = useState<'calendar' | 'block'>('calendar');
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   
   // Calculate responsive font size for stat labels
   const getStatLabelSize = () => {
     if (width < 350) return 11;
     if (width < 400) return 12;
     return 13;
+  };
+
+  const handlePrevMonth = () => {
+    setCurrentMonth(prev => subMonths(prev, 1));
+  };
+
+  const handleNextMonth = () => {
+    setCurrentMonth(prev => addMonths(prev, 1));
   };
 
   return (
@@ -88,10 +98,10 @@ export default function ProfileScreen() {
         <View style={styles.trackingSection}>
           {viewMode === 'calendar' ? (
             <CalendarLayout
-              currentMonth={new Date()}
+              currentMonth={currentMonth}
               scores={scores}
-              onPrevMonth={() => {}}
-              onNextMonth={() => {}}
+              onPrevMonth={handlePrevMonth}
+              onNextMonth={handleNextMonth}
             />
           ) : (
             <BlockLayout scores={scores} />
