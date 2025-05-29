@@ -49,6 +49,9 @@ export default function ScoreOverlay({ date, scoreData, onClose, onEdit }: Score
     }
   };
 
+  // Check if reflection exists and has content
+  const hasReflection = scoreData.reflection && scoreData.reflection.trim().length > 0;
+
   return (
     <Modal transparent={true} animationType="fade">
       <View style={styles.container}>
@@ -92,12 +95,12 @@ export default function ScoreOverlay({ date, scoreData, onClose, onEdit }: Score
               </Text>
             </View>
 
-            {scoreData.reflection && scoreData.reflection.trim().length > 0 && (
+            {hasReflection ? (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Reflection</Text>
                 <Text style={styles.reflectionText}>{scoreData.reflection}</Text>
               </View>
-            )}
+            ) : null}
           </ScrollView>
 
           <View style={styles.footer}>
