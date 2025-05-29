@@ -4,11 +4,14 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/theme';
 import { useRouter } from 'expo-router';
 import { Settings, CircleHelp as HelpCircle } from 'lucide-react-native';
+import { useTrack } from '@/context/TrackContext';
+import CalendarLayout from '@/components/CalendarLayout';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { width } = useWindowDimensions();
+  const { scores, getStreak, getCompletionRate, getAllTimeAverage } = useTrack();
   
   // Calculate responsive font size for stat labels
   const getStatLabelSize = () => {
@@ -54,20 +57,29 @@ export default function ProfileScreen() {
 
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>28</Text>
+              <Text style={styles.statValue}>{getStreak()}</Text>
               <Text style={[styles.statLabel, { fontSize: getStatLabelSize() }]}>Days Tracked</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>85%</Text>
+              <Text style={styles.statValue}>{Math.round(getCompletionRate())}%</Text>
               <Text style={[styles.statLabel, { fontSize: getStatLabelSize() }]}>Completion</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>4.2</Text>
+              <Text style={styles.statValue}>{getAllTimeAverage().toFixed(1)}</Text>
               <Text style={[styles.statLabel, { fontSize: getStatLabelSize() }]}>Avg Score</Text>
             </View>
           </View>
+        </View>
+
+        <View style={styles.calendarSection}>
+          <CalendarLayout
+            currentMonth={new Date()}
+            scores={scores}
+            onPrevMonth={() => {}}
+            onNextMonth={() => {}}
+          />
         </View>
       </ScrollView>
     </View>
@@ -171,5 +183,9 @@ const styles = StyleSheet.create({
     width: 1,
     backgroundColor: COLORS.borderColor,
     marginHorizontal: 16,
+  },
+  calendarSection: {
+    flex: 1,
+    paddingTop: 20,
   },
 });

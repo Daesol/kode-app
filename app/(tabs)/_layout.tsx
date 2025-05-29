@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
-import { ChartBar as BarChart2, Users, Calendar, User } from 'lucide-react-native';
+import { Home, Users, Calendar, User } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/theme';
 import { useTrack } from '@/context/TrackContext';
@@ -34,14 +34,14 @@ export default function TabLayout() {
           tabBarInactiveTintColor: COLORS.textSecondary,
           tabBarLabelStyle: styles.tabBarLabel,
         }}
-        initialRouteName="history"
+        initialRouteName="home"
       >
         <Tabs.Screen
-          name="history"
+          name="home"
           options={{
-            title: 'History',
+            title: 'Home',
             tabBarIcon: ({ color, size }) => (
-              <Calendar size={size} color={color} />
+              <Home size={size} color={color} />
             ),
           }}
         />
@@ -84,7 +84,7 @@ export default function TabLayout() {
           options={{
             title: 'Stats',
             tabBarIcon: ({ color, size }) => (
-              <BarChart2 size={size} color={color} />
+              <Calendar size={size} color={color} />
             ),
           }}
         />
