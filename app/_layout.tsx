@@ -39,7 +39,8 @@ function AppContent() {
       hasNavigated.current = true;
       setShowSplash(false);
       
-      const route = isAuthenticated ? '/(tabs)/home' : '/(auth)/login';
+      // Make sure we're navigating to the exact route
+      const route = isAuthenticated ? '/home' : '/login';
       console.log("Navigating to:", route);
       
       setTimeout(() => {
@@ -73,6 +74,7 @@ function AppContent() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="index" options={{ href: null }} />
       </Stack>
       <StatusBar style="light" />
     </>
@@ -81,6 +83,7 @@ function AppContent() {
 
 export default function RootLayout() {
   useFrameworkReady();
+  
   return (
     <GestureHandlerRootView style={styles.container}>
       <AuthProvider>
