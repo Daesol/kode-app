@@ -53,7 +53,7 @@ function AppContent() {
       if (!hasNavigated.current) {
         const timer = setTimeout(() => {
           handleAnimationComplete();
-        }, 3000);
+        }, 1000);
         
         return () => clearTimeout(timer);
       }
