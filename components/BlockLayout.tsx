@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { COLORS } from '@/constants/theme';
-import { format, subDays } from 'date-fns';
+import { format, subDays, startOfYear, differenceInDays } from 'date-fns';
 
 type ScoreEntry = {
   score: number;
@@ -21,6 +21,8 @@ const TOTAL_BLOCKS = 365;
 export default function BlockLayout({ scores }: BlockLayoutProps) {
   const { width: screenWidth } = useWindowDimensions();
   const today = new Date();
+  const yearStart = startOfYear(today);
+  const daysSinceYearStart = differenceInDays(today, yearStart);
 
   // Calculate item size based on screen width
   const getItemSize = () => {
@@ -41,22 +43,29 @@ export default function BlockLayout({ scores }: BlockLayoutProps) {
   const renderBlocks = () => {
     const blocks = [];
     
-    // Start from 364 days ago (to show a full year including today)
-    for (let i = TOTAL_BLOCKS - 1; i >= 0; i--) {
-      const date = subDays(today, i);
-      const dateString = format(date, 'yyyy-MM-dd');
-      const scoreEntry = scores[dateString];
-      const scoreValue = scoreEntry?.score || null;
+    // Fill in blocks for the current year
+    for (let i = 0; i < TOTAL_BLOCKS; i++) {
+      let scoreValue = null;
+      let dateString = '';
+      
+      if (i <= daysSinceYearStart) {
+        // This is a past or current date in the year
+        const date = subDays(today, daysSinceYearStart - i);
+        dateString = format(date, 'yyyy-MM-dd');
+        const scoreEntry = scores[dateString];
+        scoreValue = scoreEntry?.score || null;
+      }
       
       blocks.push(
         <View 
-          key={dateString}
+          key={dateString || `future-${i}`}
           style={[
             styles.block,
             { 
               width: itemSize,
               height: itemSize,
               backgroundColor: getScoreColor(scoreValue),
+              opacity: i <= daysSinceYearStart ? 1 : 0.3, // Dim future dates
             }
           ]}
         />
