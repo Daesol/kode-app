@@ -1,107 +1,126 @@
-import { useEffect, useRef, useState } from 'react';
-import { Stack, useRouter, useSegments } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useFrameworkReady } from '@/hooks/useFrameworkReady';
-import { useFonts, Inter_400Regular, Inter_500Medium, Inter_700Bold } from '@expo-google-fonts/inter';
-import { SplashScreen } from 'expo-router';
-import { TrackProvider } from '@/context/TrackContext';
-import { AuthProvider, useAuth } from '@/context/AuthContext';
-import CustomSplashScreen from '@/components/SplashScreen';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { StyleSheet } from 'react-native';
+import { Tabs } from 'expo-router';
+import { StyleSheet, View, TouchableOpacity } from 'react-native';
+import { Chrome as Home, Users, Calendar, User, Plus } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { COLORS } from '@/constants/theme';
+import { useTrack } from '@/context/TrackContext';
+import ScoreInput from '@/components/ScoreInput';
+import { useState } from 'react';
 
-// Prevent auto-hiding splash screen
-SplashScreen.preventAutoHideAsync();
+export default function TabLayout() {
+  const insets = useSafeAreaInsets();
+  const [showRating, setShowRating] = useState(false);
+  const { getTodayScore, addScore } = useTrack();
+  const todayScore = getTodayScore();
 
-function AppContent() {
-  const { isAuthenticated } = useAuth();
-  const routerInstance = useRouter();
-  const segments = useSegments();
-  
-  const hasNavigated = useRef(false);
-  const [showSplash, setShowSplash] = useState(true);
-  
-  const [fontsLoaded, fontError] = useFonts({
-    'Inter-Regular': Inter_400Regular,
-    'Inter-Medium': Inter_500Medium,
-    'Inter-Bold': Inter_700Bold,
-  });
-
-  useEffect(() => {
-    if (fontsLoaded || fontError) {
-      SplashScreen.hideAsync().catch(err => console.log("Error hiding splash:", err));
-    }
-  }, [fontsLoaded, fontError]);
-
-  useEffect(() => {
-    console.log("Current segments:", segments);
-    console.log("Is authenticated:", isAuthenticated);
-  }, [segments, isAuthenticated]);
-
-  const handleAnimationComplete = () => {
-    if (!hasNavigated.current) {
-      console.log("Animation complete, navigating...");
-      hasNavigated.current = true;
-      setShowSplash(false);
-      
-      // Make sure we're navigating to the exact route
-      const route = isAuthenticated ? '/home' : '/login';
-      console.log("Navigating to:", route);
-      
-      setTimeout(() => {
-        routerInstance.replace(route);
-      }, 100);
-    }
+  const handleScoreSubmit = (score: number) => {
+    addScore(score, new Date());
+    setShowRating(false);
   };
-
-  useEffect(() => {
-    if (fontsLoaded || fontError) {
-      if (!hasNavigated.current) {
-        const timer = setTimeout(() => {
-          handleAnimationComplete();
-        }, 3000);
-        
-        return () => clearTimeout(timer);
-      }
-    }
-  }, [fontsLoaded, fontError]);
-
-  if (showSplash) {
-    return (
-      <CustomSplashScreen 
-        fontsLoaded={fontsLoaded || !!fontError} 
-      />
-    );
-  }
 
   return (
     <>
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="index" options={{ href: null }} />
-      </Stack>
-      <StatusBar style="light" />
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: {
+            ...styles.tabBar,
+            height: 60 + insets.bottom,
+            paddingBottom: insets.bottom,
+            backgroundColor: COLORS.backgroundDark,
+            borderTopColor: COLORS.borderColor,
+          },
+          tabBarActiveTintColor: COLORS.primary,
+          tabBarInactiveTintColor: COLORS.textSecondary,
+          tabBarLabelStyle: styles.tabBarLabel,
+        }}
+        initialRouteName="home"
+      >
+        <Tabs.Screen
+          name="home"
+          options={{
+            title: 'Home',
+            tabBarIcon: ({ color, size }) => (
+              <Home size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="groups"
+          options={{
+            title: 'Groups',
+            tabBarIcon: ({ color, size }) => (
+              <Users size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="stats"
+          options={{
+            title: 'Stats',
+            tabBarIcon: ({ color, size }) => (
+              <Calendar size={size} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="profile"
+          options={{
+            title: 'Profile',
+            tabBarIcon: ({ color, size }) => (
+              <User size={size} color={color} />
+            ),
+          }}
+        />
+      </Tabs>
+      
+      {/* Floating Action Button for Rating */}
+      <TouchableOpacity
+        style={[
+          styles.floatingButton,
+          { bottom: 70 + insets.bottom }
+        ]}
+        onPress={() => setShowRating(true)}
+        activeOpacity={0.8}
+      >
+        <Plus size={24} color={COLORS.textPrimary} />
+      </TouchableOpacity>
+      
+      {showRating && (
+        <ScoreInput
+          onSubmit={handleScoreSubmit}
+          onCancel={() => setShowRating(false)}
+        />
+      )}
     </>
   );
 }
 
-export default function RootLayout() {
-  useFrameworkReady();
-  
-  return (
-    <GestureHandlerRootView style={styles.container}>
-      <AuthProvider>
-        <TrackProvider>
-          <AppContent />
-        </TrackProvider>
-      </AuthProvider>
-    </GestureHandlerRootView>
-  );
-}
-
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  tabBar: {
+    elevation: 0,
+    shadowOpacity: 0,
+    borderTopWidth: 1,
+    position: 'relative',
+  },
+  tabBarLabel: {
+    fontFamily: 'Inter-Medium',
+    fontSize: 12,
+    marginBottom: 5,
+  },
+  floatingButton: {
+    position: 'absolute',
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: COLORS.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
 });
