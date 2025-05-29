@@ -9,7 +9,7 @@ export const COLORS = {
   textDisabled: '#666666',
   
   // Brand colors
-  primary: '#FF6635', // Main accent color
+  primary: 'white', // Main accent color
   primaryLight: '#7D89FF',
   primaryDark: '#4352D9',
   
