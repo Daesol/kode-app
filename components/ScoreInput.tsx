@@ -29,20 +29,25 @@ const SLIDER_WIDTH = Dimensions.get('window').width - 80 - (HORIZONTAL_MARGIN);
 const KNOB_SIZE = 24;
 
 type ScoreInputProps = {
+  initialData?: {
+    score: number;
+    difficulty: number;
+    reflection?: string;
+  };
   onSubmit: (data: { score: number; difficulty: number; reflection?: string }) => void;
   onCancel: () => void;
 };
 
 type Step = 'score' | 'difficulty' | 'reflection';
 
-const ScoreInput: React.FC<ScoreInputProps> = ({ onSubmit, onCancel }) => {
+const ScoreInput: React.FC<ScoreInputProps> = ({ initialData, onSubmit, onCancel }) => {
   const [step, setStep] = useState<Step>('score');
-  const [score, setScore] = useState(50);
-  const [difficulty, setDifficulty] = useState(3);
-  const [reflection, setReflection] = useState('');
+  const [score, setScore] = useState(initialData?.score ?? 50);
+  const [difficulty, setDifficulty] = useState(initialData?.difficulty ?? 3);
+  const [reflection, setReflection] = useState(initialData?.reflection ?? '');
   const [animatedValue] = useState(new Animated.Value(0));
-  const translateX = useSharedValue(SLIDER_WIDTH * 0.5);
-  const difficultyTranslateX = useSharedValue(SLIDER_WIDTH * 0.5);
+  const translateX = useSharedValue(SLIDER_WIDTH * (score / 100));
+  const difficultyTranslateX = useSharedValue(SLIDER_WIDTH * ((difficulty - 1) / 4));
   const sliderRef = useAnimatedRef<Reanimated.View>();
   const sliderMeasured = useSharedValue(false);
   const sliderLayout = useSharedValue({ x: 0, width: SLIDER_WIDTH });
@@ -66,11 +71,6 @@ const ScoreInput: React.FC<ScoreInputProps> = ({ onSubmit, onCancel }) => {
       duration: 300,
       useNativeDriver: true,
     }).start();
-  }, []);
-
-  useEffect(() => {
-    translateX.value = SLIDER_WIDTH * 0.5;
-    updateScore(SLIDER_WIDTH * 0.5);
   }, []);
 
   const updateScore = (x: number) => {
@@ -537,5 +537,3 @@ const styles = StyleSheet.create({
     color: COLORS.textPrimary,
   },
 });
-
-export default ScoreInput;
