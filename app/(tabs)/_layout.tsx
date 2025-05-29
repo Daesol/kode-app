@@ -13,8 +13,8 @@ export default function TabLayout() {
   const { getTodayScore, addScore } = useTrack();
   const todayScore = getTodayScore();
 
-  const handleScoreSubmit = (score: number) => {
-    addScore(score, new Date());
+  const handleScoreSubmit = (data: { score: number; difficulty: number; reflection?: string }) => {
+    addScore(data);
     setShowRating(false);
   };
 
@@ -75,16 +75,18 @@ export default function TabLayout() {
       </Tabs>
       
       {/* Floating Action Button for Rating */}
-      <TouchableOpacity
-        style={[
-          styles.floatingButton,
-          { bottom: 70 + insets.bottom }
-        ]}
-        onPress={() => setShowRating(true)}
-        activeOpacity={0.8}
-      >
-        <Plus size={24} color={COLORS.textPrimary} />
-      </TouchableOpacity>
+      <View style={styles.fabContainer} pointerEvents="box-none">
+        <TouchableOpacity
+          style={[
+            styles.floatingButton,
+            { bottom: 80 + insets.bottom }
+          ]}
+          onPress={() => setShowRating(true)}
+          activeOpacity={0.8}
+        >
+          <Plus size={28} color={COLORS.textPrimary} />
+        </TouchableOpacity>
+      </View>
       
       {showRating && (
         <ScoreInput
@@ -108,12 +110,19 @@ const styles = StyleSheet.create({
     fontSize: 12,
     marginBottom: 5,
   },
+  fabContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+    zIndex: 999,
+  },
   floatingButton: {
     position: 'absolute',
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: COLORS.primary,
     alignItems: 'center',
     justifyContent: 'center',
@@ -122,5 +131,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+    borderWidth: 3,
+    borderColor: COLORS.background,
   },
 });
