@@ -10,7 +10,7 @@ import {
 import { COLORS } from '@/constants/theme';
 import { BlurView } from 'expo-blur';
 import { format } from 'date-fns';
-import { Edit3, X } from 'lucide-react-native';
+import { CreditCard as Edit3, X } from 'lucide-react-native';
 
 type ScoreEntry = {
   score: number;
