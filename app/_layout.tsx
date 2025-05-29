@@ -41,15 +41,22 @@ function AppContent() {
   const handleAnimationComplete = () => {
     if (!hasNavigated.current) {
       console.log("Animation complete, navigating...");
+      console.log("Current segments before navigation:", segments);
       hasNavigated.current = true;
       setShowSplash(false);
       
       // Make sure we're navigating to the exact route
-      const route = isAuthenticated ? '/home' : '/login';
+      const route = isAuthenticated ? '/(tabs)/home' : '/(auth)/login';
       console.log("Navigating to:", route);
+      console.log("Is authenticated:", isAuthenticated);
       
       setTimeout(() => {
-        routerInstance.replace(route);
+        try {
+          routerInstance.replace(route);
+          console.log("Navigation completed");
+        } catch (error) {
+          console.error("Navigation error:", error);
+        }
       }, 100);
     }
   };
@@ -79,6 +86,7 @@ function AppContent() {
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="index" options={{ href: null }} />
       </Stack>
       <StatusBar style="light" />
     </>
