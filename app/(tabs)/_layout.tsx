@@ -13,8 +13,8 @@ export default function TabLayout() {
   const { getTodayScore, addScore } = useTrack();
   const todayScore = getTodayScore();
 
-  const handleScoreSubmit = (score: number) => {
-    addScore(score, new Date());
+  const handleScoreSubmit = (data: { score: number; difficulty: number; reflection?: string }) => {
+    addScore(data);
     setShowRating(false);
   };
 
