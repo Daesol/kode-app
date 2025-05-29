@@ -1,38 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/theme';
 import { useRouter } from 'expo-router';
-import { Settings, LogOut, ChevronRight, Bell, Shield, CircleHelp as HelpCircle, Star } from 'lucide-react-native';
+import { LogOut, Settings, HelpCircle } from 'lucide-react-native';
 import { useAuth } from '@/context/AuthContext';
-import Header from '@/components/Header';
-
-type MenuItemProps = {
-  icon: React.ReactNode;
-  title: string;
-  subtitle?: string;
-  onPress: () => void;
-  showChevron?: boolean;
-  danger?: boolean;
-};
-
-const MenuItem = ({ icon, title, subtitle, onPress, showChevron = true, danger = false }: MenuItemProps) => (
-  <TouchableOpacity
-    style={styles.menuItem}
-    onPress={onPress}
-  >
-    <View style={styles.menuItemLeft}>
-      <View style={[styles.iconContainer, danger && styles.dangerIcon]}>
-        {icon}
-      </View>
-      <View style={styles.menuItemText}>
-        <Text style={[styles.menuItemTitle, danger && styles.dangerText]}>{title}</Text>
-        {subtitle && <Text style={styles.menuItemSubtitle}>{subtitle}</Text>}
-      </View>
-    </View>
-    {showChevron && <ChevronRight size={20} color={danger ? COLORS.error : COLORS.textSecondary} />}
-  </TouchableOpacity>
-);
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
@@ -41,7 +13,23 @@ export default function ProfileScreen() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
-      <Header title="Profile" />
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Profile</Text>
+        <View style={styles.headerIcons}>
+          <TouchableOpacity 
+            style={styles.headerIcon} 
+            onPress={() => router.push('/profile/support')}
+          >
+            <HelpCircle size={24} color={COLORS.textPrimary} />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.headerIcon} 
+            onPress={() => router.push('/profile/settings')}
+          >
+            <Settings size={24} color={COLORS.textPrimary} />
+          </TouchableOpacity>
+        </View>
+      </View>
       
       <ScrollView 
         style={styles.content}
@@ -49,10 +37,8 @@ export default function ProfileScreen() {
       >
         <View style={styles.profileSection}>
           <View style={styles.avatarContainer}>
-            <View style={styles.avatarWrapper}>
-              <View style={styles.avatar}>
-                <Text style={styles.avatarText}>JD</Text>
-              </View>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarText}>JD</Text>
             </View>
             <View style={styles.profileInfo}>
               <Text style={styles.name}>John Doe</Text>
@@ -79,49 +65,13 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Preferences</Text>
-          <MenuItem
-            icon={<Bell size={22} color={COLORS.primary} />}
-            title="Notifications"
-            subtitle="Daily reminders and alerts"
-            onPress={() => router.push('/profile/settings')}
-          />
-          <MenuItem
-            icon={<Shield size={22} color={COLORS.secondary} />}
-            title="Privacy"
-            subtitle="Manage your data and privacy"
-            onPress={() => router.push('/profile/settings')}
-          />
-          <MenuItem
-            icon={<Settings size={22} color={COLORS.tertiary} />}
-            title="Settings"
-            subtitle="App preferences and account settings"
-            onPress={() => router.push('/profile/settings')}
-          />
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Support</Text>
-          <MenuItem
-            icon={<HelpCircle size={22} color={COLORS.primary} />}
-            title="Help Center"
-            onPress={() => {}}
-          />
-          <MenuItem
-            icon={<Star size={22} color={COLORS.secondary} />}
-            title="Rate the App"
-            onPress={() => {}}
-          />
-        </View>
-
-        <View style={styles.section}>
-          <MenuItem
-            icon={<LogOut size={22} color={COLORS.error} />}
-            title="Log Out"
+          <TouchableOpacity
+            style={styles.logoutButton}
             onPress={logout}
-            showChevron={false}
-            danger
-          />
+          >
+            <LogOut size={22} color={COLORS.error} style={styles.logoutIcon} />
+            <Text style={styles.logoutText}>Log Out</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </View>
@@ -132,6 +82,29 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  header: {
+    height: 60,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    backgroundColor: COLORS.backgroundDark,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.borderColor,
+  },
+  headerTitle: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 22,
+    color: COLORS.textPrimary,
+  },
+  headerIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerIcon: {
+    marginLeft: 16,
+    padding: 4,
   },
   content: {
     flex: 1,
@@ -146,9 +119,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 24,
-  },
-  avatarWrapper: {
-    position: 'relative',
   },
   avatar: {
     width: 80,
@@ -207,58 +177,24 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   section: {
-    paddingTop: 24,
-    paddingHorizontal: 20,
+    padding: 20,
   },
-  sectionTitle: {
-    fontFamily: 'Inter-Bold',
-    fontSize: 18,
-    color: COLORS.textPrimary,
-    marginBottom: 16,
-  },
-  menuItem: {
+  logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     backgroundColor: COLORS.cardBackground,
     borderRadius: 16,
     padding: 16,
-    marginBottom: 12,
     borderWidth: 1,
     borderColor: COLORS.borderColor,
   },
-  menuItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
+  logoutIcon: {
+    marginRight: 8,
   },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: `${COLORS.primary}20`,
-    marginRight: 16,
-  },
-  dangerIcon: {
-    backgroundColor: `${COLORS.error}20`,
-  },
-  menuItemText: {
-    flex: 1,
-  },
-  menuItemTitle: {
+  logoutText: {
     fontFamily: 'Inter-Medium',
     fontSize: 16,
-    color: COLORS.textPrimary,
-    marginBottom: 2,
-  },
-  menuItemSubtitle: {
-    fontFamily: 'Inter-Regular',
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  dangerText: {
     color: COLORS.error,
   },
 });
