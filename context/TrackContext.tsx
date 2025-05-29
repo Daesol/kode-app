@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Platform } from 'react-native';
-import { format, subDays, differenceInDays, isSameDay } from 'date-fns';
+import { format, subDays, differenceInDays, isSameDay, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
 
 type RatingData = {
   score: number;
@@ -27,7 +27,7 @@ type TrackContextType = {
   scores: ScoresState;
   reminderTime: ReminderTimeState;
   addScore: (data: RatingData, date?: Date) => void;
-  getTodayScore: () => ScoreEntry | undefined;  // Changed return type to be more explicit
+  getTodayScore: () => ScoreEntry | undefined;
   getWeekAverage: () => number;
   getAllTimeAverage: () => number;
   getStreak: () => number;
@@ -76,14 +76,15 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }));
   };
   
-  const getTodayScore = (): ScoreEntry | undefined => {  // Changed return type to be more explicit
+  const getTodayScore = (): ScoreEntry | undefined => {
     const today = format(new Date(), 'yyyy-MM-dd');
     return scores[today];
   };
   
   const getWeekAverage = (): number => {
+    const today = new Date();
     const dates = Array.from({ length: 7 }, (_, i) => 
-      format(subDays(new Date(), i), 'yyyy-MM-dd')
+      format(subDays(today, i), 'yyyy-MM-dd')
     );
     
     const weekScores = dates
@@ -105,17 +106,21 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   };
   
   const getStreak = (): number => {
+    const today = startOfDay(new Date());
+    let currentDate = today;
     let streak = 0;
-    let currentDate = new Date();
     
     while (true) {
       const dateString = format(currentDate, 'yyyy-MM-dd');
-      if (scores[dateString] !== undefined) {
-        streak++;
-        currentDate = subDays(currentDate, 1);
-      } else {
+      if (!scores[dateString]) {
+        // If we haven't logged today yet, check if we have a streak from yesterday
+        if (isSameDay(currentDate, today) && scores[format(subDays(today, 1), 'yyyy-MM-dd')]) {
+          streak = 1;
+        }
         break;
       }
+      streak++;
+      currentDate = subDays(currentDate, 1);
     }
     
     return streak;
@@ -123,16 +128,23 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   
   const getCompletionRate = (): number => {
     const today = new Date();
+    const thirtyDaysAgo = subDays(today, 30);
     let trackedDays = 0;
-    
+    let totalDays = 0;
+
+    // Count only past days up to today
     for (let i = 0; i < 30; i++) {
-      const date = format(subDays(today, i), 'yyyy-MM-dd');
-      if (scores[date] !== undefined) {
-        trackedDays++;
+      const date = subDays(today, i);
+      if (isWithinInterval(date, { start: thirtyDaysAgo, end: endOfDay(today) })) {
+        totalDays++;
+        const dateString = format(date, 'yyyy-MM-dd');
+        if (scores[dateString]) {
+          trackedDays++;
+        }
       }
     }
     
-    return (trackedDays / 30) * 100;
+    return totalDays > 0 ? (trackedDays / totalDays) * 100 : 0;
   };
   
   const getWeeklyData = (): number[] => {
