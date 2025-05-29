@@ -1,8 +1,10 @@
 import { Tabs } from 'expo-router';
-import { Home, Users, Calendar, User } from 'lucide-react-native';
+import { Text } from 'react-native';
 import { COLORS } from '@/constants/theme';
 
 export default function TabLayout() {
+  console.log("TabLayout rendering");
+  
   return (
     <Tabs
       screenOptions={{
@@ -19,36 +21,56 @@ export default function TabLayout() {
         name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color, size }) => (
-            <Home size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Text style={{ color }}>H</Text>
           ),
+        }}
+        listeners={{
+          tabPress: (e) => {
+            console.log("Home tab pressed");
+          },
         }}
       />
       <Tabs.Screen
         name="groups"
         options={{
           title: 'Groups',
-          tabBarIcon: ({ color, size }) => (
-            <Users size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Text style={{ color }}>G</Text>
           ),
+        }}
+        listeners={{
+          tabPress: (e) => {
+            console.log("Groups tab pressed");
+          },
         }}
       />
       <Tabs.Screen
         name="stats"
         options={{
           title: 'Stats',
-          tabBarIcon: ({ color, size }) => (
-            <Calendar size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Text style={{ color }}>S</Text>
           ),
+        }}
+        listeners={{
+          tabPress: (e) => {
+            console.log("Stats tab pressed");
+          },
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color, size }) => (
-            <User size={size} color={color} />
+          tabBarIcon: ({ color }) => (
+            <Text style={{ color }}>P</Text>
           ),
+        }}
+        listeners={{
+          tabPress: (e) => {
+            console.log("Profile tab pressed");
+          },
         }}
       />
     </Tabs>
