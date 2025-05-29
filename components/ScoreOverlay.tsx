@@ -21,12 +21,17 @@ type ScoreEntry = {
 
 type ScoreOverlayProps = {
   date: Date;
-  scoreData: ScoreEntry;
+  scoreData?: ScoreEntry;  // Make scoreData optional
   onClose: () => void;
   onEdit: () => void;
 };
 
 export default function ScoreOverlay({ date, scoreData, onClose, onEdit }: ScoreOverlayProps) {
+  // Early return if no score data
+  if (!scoreData) {
+    return null;
+  }
+
   const getScoreColor = (score: number) => {
     if (score <= 25) return COLORS.scoreLow;
     if (score <= 50) return COLORS.scoreMediumLow;
@@ -82,7 +87,7 @@ export default function ScoreOverlay({ date, scoreData, onClose, onEdit }: Score
               </Text>
             </View>
 
-            {scoreData.reflection?.length > 0 && (
+            {scoreData.reflection && scoreData.reflection.length > 0 && (
               <View style={styles.reflectionSection}>
                 <Text style={styles.label}>Reflection</Text>
                 <Text style={styles.reflectionText}>{scoreData.reflection}</Text>
