@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/theme';
 import { useRouter } from 'expo-router';
@@ -8,6 +8,14 @@ import { Settings, CircleHelp as HelpCircle } from 'lucide-react-native';
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  
+  // Calculate responsive font size for stat labels
+  const getStatLabelSize = () => {
+    if (width < 350) return 11;
+    if (width < 400) return 12;
+    return 13;
+  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -47,17 +55,17 @@ export default function ProfileScreen() {
           <View style={styles.statsContainer}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>28</Text>
-              <Text style={styles.statLabel}>Days Tracked</Text>
+              <Text style={[styles.statLabel, { fontSize: getStatLabelSize() }]}>Days Tracked</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>85%</Text>
-              <Text style={styles.statLabel}>Completion</Text>
+              <Text style={[styles.statLabel, { fontSize: getStatLabelSize() }]}>Completion</Text>
             </View>
             <View style={styles.statDivider} />
             <View style={styles.statItem}>
               <Text style={styles.statValue}>4.2</Text>
-              <Text style={styles.statLabel}>Avg Score</Text>
+              <Text style={[styles.statLabel, { fontSize: getStatLabelSize() }]}>Avg Score</Text>
             </View>
           </View>
         </View>
@@ -156,8 +164,8 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontFamily: 'Inter-Regular',
-    fontSize: 14,
     color: COLORS.textSecondary,
+    textAlign: 'center',
   },
   statDivider: {
     width: 1,
