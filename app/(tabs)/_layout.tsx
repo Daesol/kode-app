@@ -1,10 +1,15 @@
-import { Tabs } from 'expo-router';
-import { Text } from 'react-native';
+import { Tabs, usePathname } from 'expo-router';
+import { useEffect } from 'react';
+import { Home, Users, Calendar, User } from 'lucide-react-native';
 import { COLORS } from '@/constants/theme';
 
 export default function TabLayout() {
-  console.log("TabLayout rendering");
+  const pathname = usePathname();
   
+  useEffect(() => {
+    console.log("Current pathname in tabs:", pathname);
+  }, [pathname]);
+
   return (
     <Tabs
       screenOptions={{
@@ -18,59 +23,45 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
+        name="index"
+        options={{
+          href: null, // Hide the index tab
+        }}
+      />
+      <Tabs.Screen
         name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color }}>H</Text>
+          tabBarIcon: ({ color, size }) => (
+            <Home size={size} color={color} />
           ),
-        }}
-        listeners={{
-          tabPress: (e) => {
-            console.log("Home tab pressed");
-          },
         }}
       />
       <Tabs.Screen
         name="groups"
         options={{
           title: 'Groups',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color }}>G</Text>
+          tabBarIcon: ({ color, size }) => (
+            <Users size={size} color={color} />
           ),
-        }}
-        listeners={{
-          tabPress: (e) => {
-            console.log("Groups tab pressed");
-          },
         }}
       />
       <Tabs.Screen
         name="stats"
         options={{
           title: 'Stats',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color }}>S</Text>
+          tabBarIcon: ({ color, size }) => (
+            <Calendar size={size} color={color} />
           ),
-        }}
-        listeners={{
-          tabPress: (e) => {
-            console.log("Stats tab pressed");
-          },
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
           title: 'Profile',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ color }}>P</Text>
+          tabBarIcon: ({ color, size }) => (
+            <User size={size} color={color} />
           ),
-        }}
-        listeners={{
-          tabPress: (e) => {
-            console.log("Profile tab pressed");
-          },
         }}
       />
     </Tabs>
