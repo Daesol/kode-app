@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     if (email === DEMO_EMAIL && password === DEMO_PASSWORD) {
       setIsAuthenticated(true);
-      router.replace('/(tabs)/home');
+      router.replace('/(tabs)/history');
     } else {
       throw new Error('Invalid credentials');
     }

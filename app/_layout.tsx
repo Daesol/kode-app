@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
@@ -33,30 +33,17 @@ function AppContent() {
     }
   }, [fontsLoaded, fontError]);
 
-  useEffect(() => {
-    console.log("Current segments:", segments);
-    console.log("Is authenticated:", isAuthenticated);
-  }, [segments, isAuthenticated]);
-
   const handleAnimationComplete = () => {
     if (!hasNavigated.current) {
       console.log("Animation complete, navigating...");
-      console.log("Current segments before navigation:", segments);
       hasNavigated.current = true;
       setShowSplash(false);
       
-      // Make sure we're navigating to the exact route
-      const route = isAuthenticated ? '/(tabs)/home' : '/(auth)/login';
+      const route = isAuthenticated ? '/(tabs)/history' : '/(auth)/login';
       console.log("Navigating to:", route);
-      console.log("Is authenticated:", isAuthenticated);
       
       setTimeout(() => {
-        try {
-          routerInstance.replace(route);
-          console.log("Navigation completed");
-        } catch (error) {
-          console.error("Navigation error:", error);
-        }
+        routerInstance.replace(route);
       }, 100);
     }
   };
@@ -94,7 +81,6 @@ function AppContent() {
 
 export default function RootLayout() {
   useFrameworkReady();
-  
   return (
     <GestureHandlerRootView style={styles.container}>
       <AuthProvider>

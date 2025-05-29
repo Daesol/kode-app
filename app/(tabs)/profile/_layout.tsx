@@ -11,22 +11,22 @@ export default function ProfileLayout() {
         headerTintColor: COLORS.textPrimary,
         headerTitleStyle: {
           fontFamily: 'Inter-Bold',
-          fontSize: 18,
         },
+        headerShadowVisible: false,
+        headerBackTitleVisible: false,
       }}
     >
+      <Stack.Screen 
+        name="index"
+        options={{
+          headerShown: false,
+        }}
+      />
       <Stack.Screen
         name="settings"
         options={{
           title: 'Settings',
-          headerBackTitle: 'Profile',
-        }}
-      />
-      <Stack.Screen
-        name="support"
-        options={{
-          title: 'Support',
-          headerBackTitle: 'Profile',
+          presentation: 'push',
         }}
       />
     </Stack>
