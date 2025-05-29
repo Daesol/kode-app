@@ -72,7 +72,7 @@ function AppContent() {
     <>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="(home)" />
       </Stack>
       <StatusBar style="light" />
     </>
