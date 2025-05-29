@@ -58,6 +58,8 @@ export default function TabLayout() {
           name="rate"
           options={{
             title: '',
+            // Add href: null to exclude this from navigation
+            href: null,
             tabBarButton: () => (
               <TouchableOpacity
                 style={[
@@ -98,7 +100,7 @@ export default function TabLayout() {
           }}
         />
       </Tabs>
-
+      
       {showRating && (
         <ScoreInput
           onSubmit={handleScoreSubmit}
