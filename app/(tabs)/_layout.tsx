@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
-import { Home, Users, Calendar, User } from 'lucide-react-native';
+import { Chrome as Home, Users, Calendar, User } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/theme';
 import { useTrack } from '@/context/TrackContext';
