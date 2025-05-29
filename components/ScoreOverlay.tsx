@@ -5,8 +5,7 @@ import {
   StyleSheet, 
   TouchableOpacity, 
   Modal, 
-  Platform,
-  ScrollView 
+  Platform 
 } from 'react-native';
 import { COLORS } from '@/constants/theme';
 import { BlurView } from 'expo-blur';
@@ -62,33 +61,27 @@ export default function ScoreOverlay({ date, scoreData, onClose, onEdit }: Score
             </TouchableOpacity>
           </View>
 
-          <ScrollView 
-            style={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContentContainer}
-          >
-            <View style={styles.scoreSection}>
-              <Text style={styles.label}>Effort Score</Text>
-              <Text style={[styles.scoreValue, { color: getScoreColor(scoreData.score) }]}>
-                {scoreData.score}
-                <Text style={styles.scoreMax}>/100</Text>
-              </Text>
-            </View>
+          <View style={styles.scoreSection}>
+            <Text style={styles.label}>Effort Score</Text>
+            <Text style={[styles.scoreValue, { color: getScoreColor(scoreData.score) }]}>
+              {scoreData.score}
+              <Text style={styles.scoreMax}>/100</Text>
+            </Text>
+          </View>
 
-            <View style={styles.difficultySection}>
-              <Text style={styles.label}>Perceived Difficulty</Text>
-              <Text style={styles.difficultyValue}>
-                {getDifficultyLabel(scoreData.difficulty)}
-              </Text>
-            </View>
+          <View style={styles.difficultySection}>
+            <Text style={styles.label}>Perceived Difficulty</Text>
+            <Text style={styles.difficultyValue}>
+              {getDifficultyLabel(scoreData.difficulty)}
+            </Text>
+          </View>
 
-            {scoreData.reflection && (
-              <View style={styles.reflectionSection}>
-                <Text style={styles.label}>Reflection</Text>
-                <Text style={styles.reflectionText}>{scoreData.reflection}</Text>
-              </View>
-            )}
-          </ScrollView>
+          {scoreData.reflection && (
+            <View style={styles.reflectionSection}>
+              <Text style={styles.label}>Reflection</Text>
+              <Text style={styles.reflectionText}>{scoreData.reflection}</Text>
+            </View>
+          )}
 
           <TouchableOpacity style={styles.editButton} onPress={onEdit}>
             <Edit3 size={20} color={COLORS.textPrimary} style={styles.editIcon} />
@@ -112,7 +105,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     width: '100%',
     maxWidth: 400,
-    maxHeight: '80%',
+    padding: 24,
     borderWidth: 1,
     borderColor: COLORS.borderColor,
   },
@@ -120,8 +113,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 24,
-    paddingBottom: 0,
+    marginBottom: 24,
   },
   date: {
     fontFamily: 'Inter-Bold',
@@ -130,14 +122,6 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 4,
-  },
-  scrollContent: {
-    flex: 1,
-    marginTop: 24,
-  },
-  scrollContentContainer: {
-    padding: 24,
-    paddingTop: 0,
   },
   scoreSection: {
     marginBottom: 24,
@@ -181,8 +165,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     padding: 16,
     borderRadius: 12,
-    margin: 24,
-    marginTop: 0,
+    marginTop: 8,
   },
   editIcon: {
     marginRight: 8,
