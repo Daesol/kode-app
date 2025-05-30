@@ -6,12 +6,14 @@ type RatingData = {
   score: number;
   difficulty: number;
   reflection?: string;
+  achievements?: string[];
 };
 
 type ScoreEntry = {
   score: number;
   difficulty: number;
   reflection?: string;
+  achievements?: string[];
 };
 
 type ScoresState = {
@@ -28,6 +30,7 @@ type TrackContextType = {
   reminderTime: ReminderTimeState;
   addScore: (data: RatingData, date?: Date) => void;
   getTodayScore: () => ScoreEntry | undefined;
+  getScoreForDate: (date: Date) => ScoreEntry | undefined;
   getWeekAverage: () => number;
   getAllTimeAverage: () => number;
   getStreak: () => number;
@@ -72,6 +75,7 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         score: data.score,
         difficulty: data.difficulty,
         reflection: data.reflection,
+        achievements: data.achievements,
       },
     }));
   };
@@ -79,6 +83,11 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const getTodayScore = (): ScoreEntry | undefined => {
     const today = format(new Date(), 'yyyy-MM-dd');
     return scores[today];
+  };
+  
+  const getScoreForDate = (date: Date): ScoreEntry | undefined => {
+    const dateString = format(date, 'yyyy-MM-dd');
+    return scores[dateString];
   };
   
   const getWeekAverage = (): number => {
@@ -173,6 +182,7 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         reminderTime,
         addScore,
         getTodayScore,
+        getScoreForDate,
         getWeekAverage,
         getAllTimeAverage,
         getStreak,

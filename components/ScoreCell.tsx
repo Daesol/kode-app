@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { COLORS } from '@/constants/theme';
 import { format, isToday, isAfter } from 'date-fns';
+import { useRouter } from 'expo-router';
 
 type ScoreEntry = {
   score: number;
@@ -12,10 +13,10 @@ type ScoreEntry = {
 type ScoreCellProps = {
   date: Date;
   score: number | ScoreEntry | null;
-  onPress?: (date: Date) => void;
 };
 
-export default function ScoreCell({ date, score, onPress }: ScoreCellProps) {
+export default function ScoreCell({ date, score }: ScoreCellProps) {
+  const router = useRouter();
   const day = date.getDate();
   const isCurrentDay = isToday(date);
   const isFutureDate = isAfter(date, new Date());
@@ -35,7 +36,14 @@ export default function ScoreCell({ date, score, onPress }: ScoreCellProps) {
   return (
     <TouchableOpacity 
       style={styles.cell}
-      onPress={() => onPress?.(date)}
+      onPress={() => {
+        if (!isFutureDate && scoreValue !== null) {
+          router.push({
+            pathname: '/score/[date]',
+            params: { date: date.toISOString() }
+          });
+        }
+      }}
       disabled={isFutureDate}
     >
       <View 

@@ -1,3 +1,4 @@
+import React from 'react';
 import { Tabs } from 'expo-router';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { Home, Users, Calendar, User } from 'lucide-react-native';
@@ -13,8 +14,8 @@ export default function TabLayout() {
   const { getTodayScore, addScore } = useTrack();
   const todayScore = getTodayScore();
 
-  const handleScoreSubmit = (score: number) => {
-    addScore(score, new Date());
+  const handleScoreSubmit = (data: { score: number; difficulty: number; reflection?: string }) => {
+    addScore(data, new Date());
     setShowRating(false);
   };
 
