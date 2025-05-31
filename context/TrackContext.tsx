@@ -2,18 +2,32 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Platform } from 'react-native';
 import { format, subDays, differenceInDays, isSameDay, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
 
-type RatingData = {
+export type RatingData = {
   score: number;
   difficulty: number;
   reflection?: string;
   achievements?: string[];
+  distractions?: string[];
+  wakeUpHour?: string;
+  wakeUpMinute?: string;
+  wakeUpPeriod?: 'AM' | 'PM';
+  bedtimeHour?: string;
+  bedtimeMinute?: string;
+  bedtimePeriod?: 'AM' | 'PM';
 };
 
-type ScoreEntry = {
+export type ScoreEntry = {
   score: number;
   difficulty: number;
   reflection?: string;
   achievements?: string[];
+  distractions?: string[];
+  wakeUpHour?: string;
+  wakeUpMinute?: string;
+  wakeUpPeriod?: 'AM' | 'PM';
+  bedtimeHour?: string;
+  bedtimeMinute?: string;
+  bedtimePeriod?: 'AM' | 'PM';
 };
 
 type ScoresState = {
@@ -76,6 +90,13 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         difficulty: data.difficulty,
         reflection: data.reflection,
         achievements: data.achievements,
+        distractions: data.distractions,
+        wakeUpHour: data.wakeUpHour,
+        wakeUpMinute: data.wakeUpMinute,
+        wakeUpPeriod: data.wakeUpPeriod,
+        bedtimeHour: data.bedtimeHour,
+        bedtimeMinute: data.bedtimeMinute,
+        bedtimePeriod: data.bedtimePeriod,
       },
     }));
   };
