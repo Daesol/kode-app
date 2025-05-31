@@ -11,7 +11,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/theme';
 import { format } from 'date-fns';
-import { CreditCard as Edit3, ArrowLeft, X, Check, Layers, Zap } from 'lucide-react-native';
+import { CreditCard as Edit3, ArrowLeft, X, Check, Layers, Zap, Minimize2 } from 'lucide-react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTrack } from '@/context/TrackContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -20,15 +20,20 @@ import {
   TimeDisplay,
   TimeDisplayOriginal,
   AchievementsSection,
+  AchievementsSectionBold,
   DistractionsSection,
+  DistractionsSectionBold,
   ReflectionSection,
+  ReflectionSectionBold,
   DifficultySelector,
   DifficultySelectorOriginal,
+  DifficultySelectorCompact,
   ScoreSlider,
   ScoreSliderOriginal,
+  ScoreSliderCompact,
 } from './components';
 
-type TabType = 'clean' | 'bold';
+type TabType = 'clean' | 'bold' | 'compact';
 
 export default function ScoreDetailsScreen() {
   const { date } = useLocalSearchParams();
@@ -103,6 +108,15 @@ export default function ScoreDetailsScreen() {
     setBedtimeMinute(scoreData.bedtimeMinute || '');
     setBedtimePeriod(scoreData.bedtimePeriod || 'PM');
     setIsEditing(false);
+  };
+
+  const getTabTitle = () => {
+    switch (activeTab) {
+      case 'clean': return 'CLEAN ENTRY';
+      case 'bold': return 'BOLD ENTRY';
+      case 'compact': return 'COMPACT ENTRY';
+      default: return 'ENTRY';
+    }
   };
 
   const renderCleanLayout = () => {
@@ -227,19 +241,19 @@ export default function ScoreDetailsScreen() {
           />
         </View>
 
-        <AchievementsSection
+        <AchievementsSectionBold
           achievements={editedAchievements}
           onAchievementsChange={setEditedAchievements}
           isEditing={true}
         />
 
-        <DistractionsSection
+        <DistractionsSectionBold
           distractions={editedDistractions}
           onDistractionsChange={setEditedDistractions}
           isEditing={true}
         />
 
-        <ReflectionSection
+        <ReflectionSectionBold
           reflection={editedReflection}
           onReflectionChange={setEditedReflection}
           isEditing={true}
@@ -274,25 +288,129 @@ export default function ScoreDetailsScreen() {
 
         <TimeDisplay scoreData={scoreData} />
 
-        <AchievementsSection
+        <AchievementsSectionBold
           achievements={scoreData.achievements || []}
           onAchievementsChange={() => {}}
           isEditing={false}
         />
 
-        <DistractionsSection
+        <DistractionsSectionBold
           distractions={scoreData.distractions || []}
           onDistractionsChange={() => {}}
           isEditing={false}
         />
 
-        <ReflectionSection
+        <ReflectionSectionBold
           reflection={scoreData.reflection || ''}
           onReflectionChange={() => {}}
           isEditing={false}
         />
       </>
     );
+  };
+
+  const renderCompactLayout = () => {
+    return isEditing ? (
+      <>
+        {/* Edit Mode Layout - Compact */}
+        <View style={styles.timeRow}>
+          <TimeEntry
+            label="Wake Up Time"
+            hour={wakeUpHour}
+            minute={wakeUpMinute}
+            period={wakeUpPeriod}
+            onHourChange={setWakeUpHour}
+            onMinuteChange={setWakeUpMinute}
+            onPeriodChange={setWakeUpPeriod}
+            onValidationChange={setIsWakeUpTimeValid}
+          />
+          <TimeEntry
+            label="Bedtime"
+            hour={bedtimeHour}
+            minute={bedtimeMinute}
+            period={bedtimePeriod}
+            onHourChange={setBedtimeHour}
+            onMinuteChange={setBedtimeMinute}
+            onPeriodChange={setBedtimePeriod}
+            onValidationChange={setIsBedtimeValid}
+          />
+        </View>
+
+        <ScoreSliderCompact
+          score={editedScore}
+          onScoreChange={setEditedScore}
+          isEditing={true}
+        />
+
+        <DifficultySelectorCompact
+          difficulty={editedDifficulty}
+          onDifficultyChange={setEditedDifficulty}
+          isEditing={true}
+        />
+
+        <AchievementsSectionBold
+          achievements={editedAchievements}
+          onAchievementsChange={setEditedAchievements}
+          isEditing={true}
+        />
+
+        <DistractionsSectionBold
+          distractions={editedDistractions}
+          onDistractionsChange={setEditedDistractions}
+          isEditing={true}
+        />
+
+        <ReflectionSectionBold
+          reflection={editedReflection}
+          onReflectionChange={setEditedReflection}
+          isEditing={true}
+        />
+      </>
+    ) : (
+      <>
+        {/* Display Mode Layout - Compact */}
+        <ScoreSliderCompact
+          score={scoreData.score}
+          onScoreChange={() => {}}
+          isEditing={false}
+        />
+
+        <DifficultySelectorCompact
+          difficulty={scoreData.difficulty}
+          onDifficultyChange={() => {}}
+          isEditing={false}
+        />
+
+        <TimeDisplay scoreData={scoreData} />
+
+        <AchievementsSectionBold
+          achievements={scoreData.achievements || []}
+          onAchievementsChange={() => {}}
+          isEditing={false}
+        />
+
+        <DistractionsSectionBold
+          distractions={scoreData.distractions || []}
+          onDistractionsChange={() => {}}
+          isEditing={false}
+        />
+
+        <ReflectionSectionBold
+          reflection={scoreData.reflection || ''}
+          onReflectionChange={() => {}}
+          isEditing={false}
+        />
+      </>
+    );
+  };
+
+  const renderCurrentLayout = () => {
+    switch (activeTab) {
+      case 'clean': return renderCleanLayout();
+      case 'bold': return renderBoldLayout();
+      case 'compact': return renderCompactLayout();
+      default: return renderCleanLayout();
+    }
   };
 
   return (
@@ -308,7 +426,7 @@ export default function ScoreDetailsScreen() {
           </TouchableOpacity>
           <View style={styles.dateContainer}>
             <Text style={styles.dateLabel}>
-              {activeTab === 'clean' ? 'CLEAN ENTRY' : 'BOLD ENTRY'}
+              {getTabTitle()}
             </Text>
             <Text style={styles.date}>{format(scoreDate, 'MMM d, yyyy').toUpperCase()}</Text>
           </View>
@@ -331,7 +449,7 @@ export default function ScoreDetailsScreen() {
             style={[styles.tab, activeTab === 'clean' && styles.activeTab]}
             onPress={() => setActiveTab('clean')}
           >
-            <Layers size={18} color={activeTab === 'clean' ? COLORS.textPrimary : COLORS.textSecondary} />
+            <Layers size={16} color={activeTab === 'clean' ? COLORS.textPrimary : COLORS.textSecondary} />
             <Text style={[styles.tabText, activeTab === 'clean' && styles.activeTabText]}>
               Clean
             </Text>
@@ -340,9 +458,18 @@ export default function ScoreDetailsScreen() {
             style={[styles.tab, activeTab === 'bold' && styles.activeTab]}
             onPress={() => setActiveTab('bold')}
           >
-            <Zap size={18} color={activeTab === 'bold' ? COLORS.textPrimary : COLORS.textSecondary} />
+            <Zap size={16} color={activeTab === 'bold' ? COLORS.textPrimary : COLORS.textSecondary} />
             <Text style={[styles.tabText, activeTab === 'bold' && styles.activeTabText]}>
               Bold
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.tab, activeTab === 'compact' && styles.activeTab]}
+            onPress={() => setActiveTab('compact')}
+          >
+            <Minimize2 size={16} color={activeTab === 'compact' ? COLORS.textPrimary : COLORS.textSecondary} />
+            <Text style={[styles.tabText, activeTab === 'compact' && styles.activeTabText]}>
+              Compact
             </Text>
           </TouchableOpacity>
         </View>
@@ -359,7 +486,7 @@ export default function ScoreDetailsScreen() {
             keyboardShouldPersistTaps="handled"
             keyboardDismissMode="on-drag"
           >
-            {activeTab === 'clean' ? renderCleanLayout() : renderBoldLayout()}
+            {renderCurrentLayout()}
           </ScrollView>
         </KeyboardAvoidingView>
 
@@ -497,8 +624,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    paddingVertical: 10,
+    paddingHorizontal: 8,
     borderRadius: 8,
     backgroundColor: 'transparent',
   },
@@ -512,9 +639,9 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontFamily: 'Inter-Bold',
-    fontSize: 14,
+    fontSize: 12,
     color: COLORS.textSecondary,
-    marginLeft: 6,
+    marginLeft: 5,
     letterSpacing: 0.5,
   },
   activeTabText: {
