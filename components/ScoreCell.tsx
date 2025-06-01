@@ -37,7 +37,7 @@ export default function ScoreCell({ date, score }: ScoreCellProps) {
     <TouchableOpacity 
       style={styles.cell}
       onPress={() => {
-        if (!isFutureDate && scoreValue !== null) {
+        if (!isFutureDate) {
           router.push({
             pathname: '/score/[date]',
             params: { date: date.toISOString() }

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Platform } from 'react-native';
 import { format, subDays, differenceInDays, isSameDay, startOfDay, endOfDay, isWithinInterval } from 'date-fns';
+import { generateMockData } from '@/constants/mockData';
 
 export type RatingData = {
   score: number;
@@ -63,16 +64,9 @@ export const TrackProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     const loadSavedData = async () => {
       try {
-        const today = format(new Date(), 'yyyy-MM-dd');
-        const yesterday = format(subDays(new Date(), 1), 'yyyy-MM-dd');
-        const twoDaysAgo = format(subDays(new Date(), 2), 'yyyy-MM-dd');
-        const threeDaysAgo = format(subDays(new Date(), 3), 'yyyy-MM-dd');
-        
-        setScores({
-          [threeDaysAgo]: { score: 65, difficulty: 3 },
-          [twoDaysAgo]: { score: 78, difficulty: 2 },
-          [yesterday]: { score: 82, difficulty: 1 },
-        });
+        // Load the 10 days of realistic mock data
+        const mockData = generateMockData();
+        setScores(mockData);
       } catch (error) {
         console.error('Failed to load saved data', error);
       }

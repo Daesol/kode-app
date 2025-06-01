@@ -5,6 +5,7 @@ import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_700Bold } from '@expo-google-fonts/inter';
 import { SplashScreen } from 'expo-router';
 import { TrackProvider } from '@/context/TrackContext';
+import { LogProvider } from '@/context/LogContext';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import CustomSplashScreen from '@/components/SplashScreen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -85,7 +86,9 @@ export default function RootLayout() {
     <GestureHandlerRootView style={styles.container}>
       <AuthProvider>
         <TrackProvider>
-          <AppContent />
+          <LogProvider>
+            <AppContent />
+          </LogProvider>
         </TrackProvider>
       </AuthProvider>
     </GestureHandlerRootView>

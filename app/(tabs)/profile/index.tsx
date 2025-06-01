@@ -3,17 +3,20 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, useWindowDimensio
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS } from '@/constants/theme';
 import { useRouter } from 'expo-router';
-import { Settings, CircleHelp as HelpCircle, LayoutGrid, Calendar } from 'lucide-react-native';
+import { Settings, CircleHelp as HelpCircle, LayoutGrid, Calendar, History, Target } from 'lucide-react-native';
 import { useTrack } from '@/context/TrackContext';
 import CalendarLayout from '@/components/CalendarLayout';
 import BlockLayout from '@/components/BlockLayout';
 import { addMonths, subMonths } from 'date-fns';
+
+type TabType = 'history' | 'goal' | 'calendar';
 
 export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { width } = useWindowDimensions();
   const { scores, getStreak, getCompletionRate, getAllTimeAverage } = useTrack();
+  const [activeTab, setActiveTab] = useState<TabType>('calendar');
   const [viewMode, setViewMode] = useState<'calendar' | 'block'>('calendar');
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
@@ -23,6 +26,80 @@ export default function ProfileScreen() {
 
   const handleNextMonth = () => {
     setCurrentMonth(prev => addMonths(prev, 1));
+  };
+
+  const renderHistoryTab = () => {
+    return (
+      <View style={styles.tabContent}>
+        <View style={styles.placeholderContainer}>
+          <History size={48} color={COLORS.textSecondary} />
+          <Text style={styles.placeholderTitle}>History</Text>
+          <Text style={styles.placeholderText}>
+            Your tracking history and analytics will appear here.
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
+  const renderGoalTab = () => {
+    return (
+      <View style={styles.tabContent}>
+        <View style={styles.placeholderContainer}>
+          <Target size={48} color={COLORS.textSecondary} />
+          <Text style={styles.placeholderTitle}>Goals</Text>
+          <Text style={styles.placeholderText}>
+            Set and track your personal goals and targets here.
+          </Text>
+        </View>
+      </View>
+    );
+  };
+
+  const renderCalendarTab = () => {
+    return (
+      <View style={styles.tabContent}>
+        {/* View Mode Toggle for Calendar Tab */}
+        <View style={styles.calendarHeader}>
+          <TouchableOpacity 
+            style={styles.viewModeButton} 
+            onPress={() => setViewMode(prev => prev === 'calendar' ? 'block' : 'calendar')}
+          >
+            {viewMode === 'calendar' ? (
+              <LayoutGrid size={20} color={COLORS.textPrimary} />
+            ) : (
+              <Calendar size={20} color={COLORS.textPrimary} />
+            )}
+            <Text style={styles.viewModeText}>
+              {viewMode === 'calendar' ? 'Grid View' : 'Calendar View'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+
+        {/* Tracking Visualization */}
+        <View style={styles.trackingSection}>
+          {viewMode === 'calendar' ? (
+            <CalendarLayout
+              currentMonth={currentMonth}
+              scores={scores}
+              onPrevMonth={handlePrevMonth}
+              onNextMonth={handleNextMonth}
+            />
+          ) : (
+            <BlockLayout scores={scores} />
+          )}
+        </View>
+      </View>
+    );
+  };
+
+  const renderCurrentTab = () => {
+    switch (activeTab) {
+      case 'history': return renderHistoryTab();
+      case 'goal': return renderGoalTab();
+      case 'calendar': return renderCalendarTab();
+      default: return renderCalendarTab();
+    }
   };
 
   return (
@@ -40,16 +117,6 @@ export default function ProfileScreen() {
         </View>
         
         <View style={styles.headerIcons}>
-          <TouchableOpacity 
-            style={styles.headerIcon} 
-            onPress={() => setViewMode(prev => prev === 'calendar' ? 'block' : 'calendar')}
-          >
-            {viewMode === 'calendar' ? (
-              <LayoutGrid size={20} color={COLORS.textPrimary} />
-            ) : (
-              <Calendar size={20} color={COLORS.textPrimary} />
-            )}
-          </TouchableOpacity>
           <TouchableOpacity 
             style={styles.headerIcon} 
             onPress={() => router.push('/profile/support')}
@@ -80,36 +147,43 @@ export default function ProfileScreen() {
           <Text style={styles.statLabel}>Avg Score</Text>
         </View>
       </View>
+
+      {/* Tab Selector */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity 
+          style={[styles.tab, activeTab === 'history' && styles.activeTab]}
+          onPress={() => setActiveTab('history')}
+        >
+          <History size={18} color={activeTab === 'history' ? COLORS.textPrimary : COLORS.textSecondary} />
+          <Text style={[styles.tabText, activeTab === 'history' && styles.activeTabText]}>
+            History
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.tab, activeTab === 'goal' && styles.activeTab]}
+          onPress={() => setActiveTab('goal')}
+        >
+          <Target size={18} color={activeTab === 'goal' ? COLORS.textPrimary : COLORS.textSecondary} />
+          <Text style={[styles.tabText, activeTab === 'goal' && styles.activeTabText]}>
+            Goals
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.tab, activeTab === 'calendar' && styles.activeTab]}
+          onPress={() => setActiveTab('calendar')}
+        >
+          <Calendar size={18} color={activeTab === 'calendar' ? COLORS.textPrimary : COLORS.textSecondary} />
+          <Text style={[styles.tabText, activeTab === 'calendar' && styles.activeTabText]}>
+            Calendar
+          </Text>
+        </TouchableOpacity>
+      </View>
       
       <ScrollView 
         style={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        {/* Tracking Visualization */}
-        <View style={styles.trackingSection}>
-          {viewMode === 'calendar' ? (
-            <CalendarLayout
-              currentMonth={currentMonth}
-              scores={scores}
-              onPrevMonth={handlePrevMonth}
-              onNextMonth={handleNextMonth}
-            />
-          ) : (
-            <BlockLayout scores={scores} />
-          )}
-        </View>
-
-        {/* Reserved space for future content */}
-        <View style={styles.futureContentSpace}>
-          {/* This space is now available for additional features like:
-              - Achievement badges
-              - Goals/targets
-              - Recent activity feed
-              - Social features
-              - Settings shortcuts
-              - Insights/analytics
-          */}
-        </View>
+        {renderCurrentTab()}
       </ScrollView>
     </View>
   );
@@ -196,16 +270,94 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     marginTop: 2,
   },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: COLORS.backgroundDark,
+    marginHorizontal: 16,
+    marginVertical: 8,
+    borderRadius: 12,
+    padding: 4,
+    borderWidth: 1,
+    borderColor: COLORS.borderColor,
+  },
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+  },
+  activeTab: {
+    backgroundColor: COLORS.primary,
+    shadowColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  tabText: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 13,
+    color: COLORS.textSecondary,
+    marginLeft: 6,
+    letterSpacing: 0.5,
+  },
+  activeTabText: {
+    color: COLORS.textPrimary,
+  },
   content: {
     flex: 1,
   },
-  trackingSection: {
+  tabContent: {
+    flex: 1,
     paddingTop: 16,
   },
-  futureContentSpace: {
-    minHeight: 200,
+  placeholderContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+    paddingVertical: 64,
+  },
+  placeholderTitle: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 24,
+    color: COLORS.textPrimary,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  placeholderText: {
+    fontFamily: 'Inter-Regular',
+    fontSize: 16,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  calendarHeader: {
     paddingHorizontal: 16,
-    paddingVertical: 20,
-    // This space is ready for future content
+    paddingBottom: 8,
+    alignItems: 'flex-end',
+  },
+  viewModeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.cardBackground,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.borderColor,
+  },
+  viewModeText: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 12,
+    color: COLORS.textPrimary,
+    marginLeft: 6,
+  },
+  trackingSection: {
+    paddingTop: 8,
   },
 });

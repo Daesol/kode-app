@@ -13,7 +13,7 @@ import { COLORS } from '@/constants/theme';
 import { format } from 'date-fns';
 import { CreditCard as Edit3, ArrowLeft, X, Check, Layers, Zap, Minimize2 } from 'lucide-react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useTrack } from '@/context/TrackContext';
+import { useJournalWithLogs } from '@/hooks/useJournalWithLogs';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import {
   TimeEntry,
@@ -39,15 +39,18 @@ export default function ScoreDetailsScreen() {
   const { date } = useLocalSearchParams();
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { getScoreForDate, addScore } = useTrack();
+  const { getScoreForDate, addScoreWithLogs } = useJournalWithLogs();
   
   const scoreDate = new Date(date as string);
   const scoreData = getScoreForDate(scoreDate);
   
+  // Check if this is a new entry (no existing data)
+  const isNewEntry = !scoreData;
+  
   const [activeTab, setActiveTab] = useState<TabType>('clean');
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedScore, setEditedScore] = useState(scoreData?.score || 50);
-  const [editedDifficulty, setEditedDifficulty] = useState(scoreData?.difficulty || 3);
+  const [isEditing, setIsEditing] = useState(isNewEntry); // Auto-start edit mode for new entries
+  const [editedScore, setEditedScore] = useState(scoreData?.score || 0);
+  const [editedDifficulty, setEditedDifficulty] = useState(scoreData?.difficulty || 1);
   const [editedReflection, setEditedReflection] = useState(scoreData?.reflection || '');
   const [editedAchievements, setEditedAchievements] = useState<string[]>(
     scoreData?.achievements || []
@@ -68,10 +71,6 @@ export default function ScoreDetailsScreen() {
   const [isWakeUpTimeValid, setIsWakeUpTimeValid] = useState(true);
   const [isBedtimeValid, setIsBedtimeValid] = useState(true);
 
-  if (!scoreData) {
-    return null;
-  }
-
   const handleSave = () => {
     // Check if times are valid before saving
     if (!isWakeUpTimeValid || !isBedtimeValid) {
@@ -79,7 +78,7 @@ export default function ScoreDetailsScreen() {
       return;
     }
 
-    addScore({
+    addScoreWithLogs({
       score: editedScore,
       difficulty: editedDifficulty,
       reflection: editedReflection.trim(),
@@ -96,18 +95,24 @@ export default function ScoreDetailsScreen() {
   };
 
   const handleCancel = () => {
-    setEditedScore(scoreData.score);
-    setEditedDifficulty(scoreData.difficulty);
-    setEditedReflection(scoreData.reflection || '');
-    setEditedAchievements(scoreData.achievements || []);
-    setEditedDistractions(scoreData.distractions || []);
-    setWakeUpHour(scoreData.wakeUpHour || '');
-    setWakeUpMinute(scoreData.wakeUpMinute || '');
-    setWakeUpPeriod(scoreData.wakeUpPeriod || 'AM');
-    setBedtimeHour(scoreData.bedtimeHour || '');
-    setBedtimeMinute(scoreData.bedtimeMinute || '');
-    setBedtimePeriod(scoreData.bedtimePeriod || 'PM');
-    setIsEditing(false);
+    if (isNewEntry) {
+      // For new entries, go back to calendar
+      router.back();
+    } else {
+      // For existing entries, restore original values
+      setEditedScore(scoreData!.score);
+      setEditedDifficulty(scoreData!.difficulty);
+      setEditedReflection(scoreData!.reflection || '');
+      setEditedAchievements(scoreData!.achievements || []);
+      setEditedDistractions(scoreData!.distractions || []);
+      setWakeUpHour(scoreData!.wakeUpHour || '');
+      setWakeUpMinute(scoreData!.wakeUpMinute || '');
+      setWakeUpPeriod(scoreData!.wakeUpPeriod || 'AM');
+      setBedtimeHour(scoreData!.bedtimeHour || '');
+      setBedtimeMinute(scoreData!.bedtimeMinute || '');
+      setBedtimePeriod(scoreData!.bedtimePeriod || 'PM');
+      setIsEditing(false);
+    }
   };
 
   const getTabTitle = () => {
@@ -179,34 +184,34 @@ export default function ScoreDetailsScreen() {
     ) : (
       <>
         {/* Display Mode Layout - Clean */}
-        <TimeDisplayOriginal scoreData={scoreData} />
+        <TimeDisplayOriginal scoreData={scoreData || { score: 0, difficulty: 1 }} />
 
         <AchievementsSection
-          achievements={scoreData.achievements || []}
+          achievements={scoreData?.achievements || []}
           onAchievementsChange={() => {}}
           isEditing={false}
         />
 
         <DistractionsSection
-          distractions={scoreData.distractions || []}
+          distractions={scoreData?.distractions || []}
           onDistractionsChange={() => {}}
           isEditing={false}
         />
 
         <ReflectionSection
-          reflection={scoreData.reflection || ''}
+          reflection={scoreData?.reflection || ''}
           onReflectionChange={() => {}}
           isEditing={false}
         />
 
         <DifficultySelectorOriginal
-          difficulty={scoreData.difficulty}
+          difficulty={scoreData?.difficulty || 1}
           onDifficultyChange={() => {}}
           isEditing={false}
         />
 
         <ScoreSliderOriginal
-          score={scoreData.score}
+          score={scoreData?.score || 0}
           onScoreChange={() => {}}
           isEditing={false}
         />
@@ -275,33 +280,33 @@ export default function ScoreDetailsScreen() {
       <>
         {/* Display Mode Layout - Bold */}
         <ScoreSlider
-          score={scoreData.score}
+          score={scoreData?.score || 0}
           onScoreChange={() => {}}
           isEditing={false}
         />
 
         <DifficultySelector
-          difficulty={scoreData.difficulty}
+          difficulty={scoreData?.difficulty || 1}
           onDifficultyChange={() => {}}
           isEditing={false}
         />
 
-        <TimeDisplay scoreData={scoreData} />
+        <TimeDisplay scoreData={scoreData || { score: 0, difficulty: 1 }} />
 
         <AchievementsSectionBold
-          achievements={scoreData.achievements || []}
+          achievements={scoreData?.achievements || []}
           onAchievementsChange={() => {}}
           isEditing={false}
         />
 
         <DistractionsSectionBold
-          distractions={scoreData.distractions || []}
+          distractions={scoreData?.distractions || []}
           onDistractionsChange={() => {}}
           isEditing={false}
         />
 
         <ReflectionSectionBold
-          reflection={scoreData.reflection || ''}
+          reflection={scoreData?.reflection || ''}
           onReflectionChange={() => {}}
           isEditing={false}
         />
@@ -370,33 +375,33 @@ export default function ScoreDetailsScreen() {
       <>
         {/* Display Mode Layout - Compact */}
         <ScoreSliderCompact
-          score={scoreData.score}
+          score={scoreData?.score || 0}
           onScoreChange={() => {}}
           isEditing={false}
         />
 
         <DifficultySelectorCompact
-          difficulty={scoreData.difficulty}
+          difficulty={scoreData?.difficulty || 1}
           onDifficultyChange={() => {}}
           isEditing={false}
         />
 
-        <TimeDisplay scoreData={scoreData} />
+        <TimeDisplay scoreData={scoreData || { score: 0, difficulty: 1 }} />
 
         <AchievementsSectionBold
-          achievements={scoreData.achievements || []}
+          achievements={scoreData?.achievements || []}
           onAchievementsChange={() => {}}
           isEditing={false}
         />
 
         <DistractionsSectionBold
-          distractions={scoreData.distractions || []}
+          distractions={scoreData?.distractions || []}
           onDistractionsChange={() => {}}
           isEditing={false}
         />
 
         <ReflectionSectionBold
-          reflection={scoreData.reflection || ''}
+          reflection={scoreData?.reflection || ''}
           onReflectionChange={() => {}}
           isEditing={false}
         />
@@ -502,7 +507,9 @@ export default function ScoreDetailsScreen() {
               disabled={!isWakeUpTimeValid || !isBedtimeValid}
             >
               <Check size={18} color={COLORS.textPrimary} style={styles.editIcon} />
-              <Text style={styles.editButtonText}>Save Changes</Text>
+              <Text style={styles.editButtonText}>
+                {isNewEntry ? 'Create Entry' : 'Save Changes'}
+              </Text>
             </TouchableOpacity>
           ) : (
             <TouchableOpacity 
