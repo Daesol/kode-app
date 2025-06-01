@@ -7,7 +7,8 @@ import { Settings, CircleHelp as HelpCircle, LayoutGrid, Calendar, History, Targ
 import { useTrack } from '@/context/TrackContext';
 import CalendarLayout from '@/components/CalendarLayout';
 import BlockLayout from '@/components/BlockLayout';
-import { addMonths, subMonths } from 'date-fns';
+import DailyCard from '@/components/DailyCard';
+import { addMonths, subMonths, format, isBefore, startOfDay } from 'date-fns';
 
 type TabType = 'history' | 'goal' | 'calendar';
 
@@ -29,15 +30,44 @@ export default function ProfileScreen() {
   };
 
   const renderHistoryTab = () => {
+    // Get today's date for filtering
+    const today = startOfDay(new Date());
+    
+    // Get all entries and sort by date (newest first)
+    // Include today's data if it exists, exclude future dates
+    const historicalEntries = Object.entries(scores)
+      .filter(([dateString]) => {
+        // Parse date string reliably without timezone issues
+        const [year, month, day] = dateString.split('-').map(Number);
+        const entryDate = startOfDay(new Date(year, month - 1, day));
+        // Include today and before, exclude future dates
+        return entryDate.getTime() <= today.getTime();
+      })
+      .sort(([dateA], [dateB]) => {
+        return new Date(dateB).getTime() - new Date(dateA).getTime();
+      });
+
+    if (historicalEntries.length === 0) {
+      return (
+        <View style={styles.tabContent}>
+          <View style={styles.placeholderContainer}>
+            <History size={48} color={COLORS.textSecondary} />
+            <Text style={styles.placeholderTitle}>No History Yet</Text>
+            <Text style={styles.placeholderText}>
+              Your daily journal entries will appear here once you start tracking.
+            </Text>
+          </View>
+        </View>
+      );
+    }
+
     return (
       <View style={styles.tabContent}>
-        <View style={styles.placeholderContainer}>
-          <History size={48} color={COLORS.textSecondary} />
-          <Text style={styles.placeholderTitle}>History</Text>
-          <Text style={styles.placeholderText}>
-            Your tracking history and analytics will appear here.
-          </Text>
-        </View>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {historicalEntries.map(([date, scoreData]) => (
+            <DailyCard key={date} date={date} scoreData={scoreData} />
+          ))}
+        </ScrollView>
       </View>
     );
   };
